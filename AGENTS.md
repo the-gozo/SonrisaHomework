@@ -11,11 +11,21 @@ This is underspecified on purpose. We need to work out a flexible solution by fi
 ## Workflow
 
 - Read `workflow.md` before starting work. It describes the project's iterative, specification-driven approach.
+- Derive specs from the underspecified project description in `AGENTS.md`, identifying gaps and clarifying requirements as needed. Write each spec as a Markdown (`.md`) file and group specs into sequential iteration folders under `specs/`, such as `iter1/`, `iter2/`, and so on. Each iteration should deliver a small, reviewable increment.
 - Summarize the task and intended changes before implementing.
 - Work through specs in their defined iteration order. Keep each deliverable small and reviewable.
 - Treat each feature's spec as its source of truth for requirements, acceptance criteria, implementation plan, and verification.
 - Update the relevant spec when requirements or implementation context change. Ask for clarification when a missing requirement blocks progress.
 - Favor a working skeleton in early iterations, then extend it incrementally.
+
+## Spec discussion notes and decisions
+
+For each spec, maintain two companion files in the same iteration folder:
+
+- `<spec-name>_DISCUSSION_NOTES.md`: After each substantive discussion, append a dated summary of the context, proposals, reasoning, open questions, and next steps. Preserve earlier entries and record corrections in new entries.
+- `<spec-name>.DECISIONS.md`: Record technical choices and their rationale only after explicit user approval. Link approved decisions from the relevant discussion entries.
+
+For `login.md`, use `login_DISCUSSION_NOTES.md` and `login.DECISIONS.md`.
 
 ## Implementation
 
