@@ -1,0 +1,6 @@
+@notif_be_HostAddress = http://localhost:5041
+
+GET {{notif_be_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
