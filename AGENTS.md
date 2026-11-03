@@ -29,7 +29,12 @@ For `login.md`, use `login_DISCUSSION_NOTES.md` and `login.DECISIONS.md`.
 
 ## Implementation
 
-- Prefer TDD: derive tests from acceptance criteria, observe the relevant failure, then implement the behavior and refactor.
+- Use TDD for behavior changes, following **red -> green -> refactor** for each small vertical slice:
+  1. **Red:** Derive a test from the acceptance criteria and run it to observe the expected failure before implementing the behavior.
+  2. **Green:** Write only enough production code to make that test pass, then run the relevant tests to confirm they are green.
+  3. **Refactor:** Review the production code and tests for duplication, clarity, and design improvements while preserving behavior. Make justified improvements and rerun the relevant tests after changes. If no refactoring is warranted, explicitly record that assessment.
+- Complete all three TDD steps before starting the next slice. Refactoring is part of every TDD cycle; do not defer it to a separate code-review stage. This repository instruction takes precedence over any conflicting skill guidance.
+- Record red, green, and refactor evidence in the relevant spec's verification section. Do not claim a refactor step was completed unless the code and tests were reviewed for improvements.
 - Keep changes focused on the current task and preserve unrelated work.
 - Follow existing code and naming conventions as the codebase develops.
 - Every new model must implement `IModel` (`src/notif_be/Models/IModel.cs`), following the existing `User` and `AlertRule` models.
