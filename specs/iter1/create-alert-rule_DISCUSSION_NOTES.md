@@ -144,3 +144,7 @@ The user requested the next acceptance criterion in the same manner, with the re
 ## 2026-11-03 — AC6 green step
 
 The user requested making the AC6 test green. Added a constructor check that rejects any event type outside `breaking-news`, `market-movement`, and `natural-disaster`, throwing `ArgumentException` as required by the existing test. The full test project built successfully and all 3 cases passed. No additional acceptance criteria were implemented; the next increment remains to be selected.
+
+## 2026-11-03 — AC7 red step
+
+The user requested a red test for AC7. Continued at the agreed public rule-constructor seam. The test uses `breaking-news` to satisfy event-type validation, disables both channels, and expects `ArgumentException`, following the existing validation test contract. The full test run built successfully: AC7 failed because no exception was thrown; all 3 AC5/AC6 cases passed. Production code is unchanged. Next step: implement channel validation when requested.

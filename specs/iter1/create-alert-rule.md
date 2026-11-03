@@ -77,6 +77,8 @@ The brief still requires delivery, extensibility, and an admin view for the over
 
 ## Implementation plan
 
+AC7 current increment: add one failing constructor test using the valid event type `breaking-news` with both notification channels disabled. Expect `ArgumentException`, following the existing validation test contract. Stop at red; channel validation is not implemented in this increment.
+
 Current increment: test AC5 through the public `AlertRule` constructor, without a user record. Constructing with an empty event-type array, email enabled, and Slack disabled throws `ArgumentException`. After observing red, the user requested functionality; the constructor now rejects an empty array. The exception type is the initial test contract, not a separately approved API failure contract.
 
 For later implementation, after review and resolution of any open questions needed by the chosen increment:
@@ -90,6 +92,8 @@ AC6 increment: following its observed red test and the user's request to make it
 5. Add the interaction interface according to its separate spec and run the applicable build and tests.
 
 ## Verification
+
+AC7 red step (2026-11-03): ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`. Both projects built. `Alert_rule_rejects_both_notification_channels_disabled` failed as intended because no `ArgumentException` was thrown. The 3 existing AC5/AC6 cases passed (1 failed, 3 passed). Production code is unchanged.
 
 AC6 red step (2026-11-03): added `Alert_rule_rejects_an_unknown_event_type` at the same public constructor seam, with an unknown type alone and alongside `breaking-news`. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built; both AC6 cases failed because no `ArgumentException` was thrown, and AC5 passed (2 failed, 1 passed). Production code is unchanged; unknown-event-type validation awaits the green step.
 

@@ -4,6 +4,15 @@ namespace notif_be_tests;
 
 public class AlertRuleTests
 {
+    [Fact]
+    public void Alert_rule_rejects_both_notification_channels_disabled()
+    {
+        Assert.Throws<ArgumentException>(() => new AlertRule(
+            eventTypes: new[] { "breaking-news" },
+            emailEnabled: false,
+            slackEnabled: false));
+    }
+
     [Theory]
     [InlineData("unknown-event")]
     [InlineData("breaking-news", "unknown-event")]
