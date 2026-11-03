@@ -45,4 +45,7 @@ For `login.md`, use `login_DISCUSSION_NOTES.md` and `login.DECISIONS.md`.
 
 ## Project setup
 
-The repository currently has no application solution, build commands, or test suite. Once these exist, document the actual setup, build, and test commands here.
+- `src/notif_be/` contains the ASP.NET Core backend project targeting .NET 10.
+- `src/notif_be_tests/` contains the xUnit test project targeting .NET 10.
+- Build the backend with `dotnet build src/notif_be/notif_be.csproj`.
+- Run tests with `dotnet test src/notif_be_tests/notif_be_tests.csproj`.
