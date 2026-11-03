@@ -268,3 +268,15 @@ The user requested: "make it green". Re-ran the existing AC8 test and observed i
 Refactor assessment: Reviewed production code and the result test for duplication, clarity, and design improvements. No refactoring was warranted for the direct list accumulation. No new model, abstraction, or test was added. Success indicates service-call completion; failure handling remains deferred to AC9.
 
 Verification: All 35 tests passed, with 0 failures and 0 skips. Backend build succeeded with 0 warnings and 0 errors. Recorded red, green, and refactor evidence in the spec. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — AC10 and AC11 test coverage
+
+The user requested: "Create test for AC10 and AC 11". Used the already approved processing boundary with the real in-memory repository and recording notification-service double.
+
+AC10: added a two-case theory for empty input and nonmatching/rule-less users, asserting both empty results and no notification requests. Extended the existing mixed-recipient test to verify skipped users are also omitted from results when another user matches. Ran each slice before proceeding; all passed against existing production code.
+
+AC11: added a test processing the same event twice with two matching users. Verified requests after the first submission, repeat requests after the second, exact event forwarding, and independent successful summaries for both submissions. The initial filtered run passed.
+
+No red state was observed or manufactured and no production code changed. Refactor review after each slice found no further changes warranted: reused the existing recording service, shared no-recipient cases through a theory, and extended the mixed-recipient example rather than duplicating it.
+
+Full verification: 38 tests passed, 0 failures, 0 skips. Backend build succeeded with 0 warnings and 0 errors. AC10 and AC11 are complete; AC2 processing-boundary checks and AC9 remain pending. Changes remain uncommitted; no push was requested.

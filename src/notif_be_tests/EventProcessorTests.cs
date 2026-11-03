@@ -7,6 +7,57 @@ namespace notif_be_tests;
 public class EventProcessorTests
 {
     [Fact]
+    public async Task Processing_the_same_event_twice_requests_notifications_again_for_matching_users()
+    {
+        var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
+        var repository = new InMemoryUserRepository(new[]
+        {
+            new User(42, "alice@example.com", rule),
+            new User(43, "bob@example.com", rule)
+        });
+        var notifyService = new RecordingNotifyService();
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
+
+        var firstResults = await processor.ProcessAsync(worldEvent);
+
+        Assert.Equal(new[] { 42, 43 }, notifyService.Requests.Select(request => request.User.Id));
+
+        var secondResults = await processor.ProcessAsync(worldEvent);
+
+        Assert.Equal(new[] { 42, 43, 42, 43 },
+            notifyService.Requests.Select(request => request.User.Id));
+        Assert.All(notifyService.Requests, request => Assert.Same(worldEvent, request.Event));
+        Assert.Equal(new[] { (42, true), (43, true) }, firstResults);
+        Assert.Equal(new[] { (42, true), (43, true) }, secondResults);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Processing_returns_no_results_or_notification_requests_when_no_users_match(
+        bool includeNonmatchingUsers)
+    {
+        var nonmatchingRule = new AlertRule(17, new[] { "market-movement" }, true, false);
+        var users = includeNonmatchingUsers
+            ? new[]
+            {
+                new User(42, "alice@example.com", nonmatchingRule),
+                new User(43, "bob@example.com")
+            }
+            : Array.Empty<User>();
+        var repository = new InMemoryUserRepository(users);
+        var notifyService = new RecordingNotifyService();
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
+
+        var results = await processor.ProcessAsync(worldEvent);
+
+        Assert.Empty(results);
+        Assert.Empty(notifyService.Requests);
+    }
+
+    [Fact]
     public async Task Processing_returns_a_successful_result_when_a_users_notification_request_completes()
     {
         var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
@@ -120,11 +171,13 @@ public class EventProcessorTests
         var processor = new EventProcessor(repository, notifyService);
         var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
 
-        await processor.ProcessAsync(worldEvent);
+        var results = await processor.ProcessAsync(worldEvent);
 
         var request = Assert.Single(notifyService.Requests);
         Assert.Equal(42, request.User.Id);
         Assert.Same(worldEvent, request.Event);
+        var result = Assert.Single(results);
+        Assert.Equal(42, result.UserId);
     }
 
     private sealed class BlockingNotifyService(int blockedUserId) : INotifyService

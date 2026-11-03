@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3–AC8 behavior are implemented and verified. The processor returns a successful per-user entry after each completed notification-service call. INotifyService is declared without a production implementation. Further behavior and verification under AC2 and AC9–AC11 remain pending.
+Status: Partially implemented. The Event model and AC3–AC8, AC10, and AC11 behavior are implemented and verified. The processor returns successful per-user entries, skips nonmatching users, supports no-recipient cases, and processes repeated submissions independently. INotifyService is declared without a production implementation. AC2 processing-boundary verification and AC9 failure isolation remain pending.
 
 ## Goal
 
@@ -185,6 +185,17 @@ AC8 green and refactor verification on 2026-11-03:
 - Full suite: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 35 tests, with 0 failures and 0 skips.
 - Backend: `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
 - AC8 is complete. Success reflects service-call completion rather than confirmed receipt. Exceptions still propagate; failure isolation and failed entries remain AC9 work.
+
+AC10 and AC11 verification on 2026-11-03:
+
+- The user requested tests for both criteria at the existing approved processing boundary, using the real in-memory repository and recording notification-service double.
+- AC10: a two-case theory verifies an empty repository and a repository containing a nonmatching user and a user without a rule. Both cases return empty results and make no notification requests. Extended the existing mixed-recipient test to assert that only the matching user's ID appears in results, covering omission of skipped users even when another user matches.
+- AC11: a new test submits the same event twice to the same processor with two matching users. It checks one request per user after the first submission, another request per user after the second, the supplied event on every request, and independent successful result lists for each submission.
+- Initial runs: both AC10 cases, the extended mixed-recipient test, and the AC11 test passed against unchanged production code. No red state was observed or manufactured, and no implementation changes were needed.
+- Refactor: reviewed each slice's tests and the processor before proceeding. No refactoring was warranted: existing doubles were reused, the no-recipient cases share a theory, and the existing mixed-recipient example was extended instead of duplicated.
+- Full suite: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 38 tests, with 0 failures and 0 skips.
+- Backend: `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
+- AC10 and AC11 are fully verified. AC2 processing-boundary checks and AC9 remain pending.
 
 Verification commands:
 
