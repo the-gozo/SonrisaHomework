@@ -308,3 +308,11 @@ Context: Identified null-event rejection before lookup or notification as the re
 Wrapped the real empty in-memory repository in a small test-only recording decorator to observe lookup. This explicitly verifies the required absence of lookup rather than internal processing details; an empty repository also ensures rejection does not depend on the recipient loop. Reused the recording notification-service double.
 
 Verification: The filtered test compiles and executes but fails because no exception is thrown. Later no-side-effect assertions are not reached. Building the test project succeeds with 0 warnings and 0 errors, including the backend. No production code changed. Stopped at red; green and refactor remain pending. No full-suite rerun, commit, or push was requested.
+
+## 2026-11-03 — AC2 null guard implemented; iteration 2 criteria complete
+
+The user requested: "make it green". Re-ran the existing null-event test and confirmed its expected missing-exception failure. Added ArgumentNullException.ThrowIfNull(worldEvent) at the beginning of ProcessAsync, before any repository lookup. The unchanged test then passed, verifying the parameter name and absence of both lookup and notification requests.
+
+Refactor assessment: Reviewed the processor, guard, and test/decorator for duplication, clarity, and design improvements. No refactoring was warranted for the standard single-line guard and existing public-boundary checks.
+
+Verification: All 40 tests passed with 0 failures and 0 skips. Backend build succeeded with 0 warnings and 0 errors. AC2 and all remaining iteration 2 acceptance criteria are now complete. Concrete providers and admin view remain iteration 3 work. Changes remain uncommitted; no push was requested.

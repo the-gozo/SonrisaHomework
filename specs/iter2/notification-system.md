@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3–AC11 behavior are implemented and verified. The processor returns per-user success/failure entries, continues after notification failures without retries, skips nonmatching users, supports no-recipient cases, and processes repeated submissions independently. INotifyService is declared without a production implementation. AC2 processing-boundary verification remains pending.
+Status: Implemented and verified. AC1–AC11 are complete, including null-event rejection before user lookup or notification requests. INotifyService is declared without a production implementation, as required for iteration 2. Concrete email/Slack providers and the admin view remain deferred to iteration 3.
 
 ## Goal
 
@@ -224,6 +224,15 @@ AC2 processing-boundary red-stage verification on 2026-11-03:
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_rejects_a_null_event_before_user_lookup_or_notification_requests`: compiled and executed 1 test, which failed because no ArgumentNullException was thrown. Later assertions were not reached. This is the expected red state.
 - `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded with 0 warnings and 0 errors, building both projects.
 - No production code changed. Stopped at red; null-guard implementation and refactor review remain pending. The full suite was not rerun; the historical 39-test pass predates this intentionally failing test.
+
+AC2 processing-boundary green and refactor verification on 2026-11-03:
+
+- The user requested making the test green. Red: re-ran the existing null-event test and confirmed failure because no ArgumentNullException was thrown.
+- Green: added `ArgumentNullException.ThrowIfNull(worldEvent)` at the start of ProcessAsync, before result allocation and repository lookup. The unchanged test passed, including parameter-name, no-lookup, and no-notification assertions.
+- Refactor: reviewed the guard, processor, and null-event test/decorator for duplication, clarity, and design improvements. No refactoring was warranted: a standard single-line guard expresses the requirement directly, while the existing test observes the required absence of side effects.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: all 40 tests passed, with 0 failures and 0 skips.
+- `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
+- AC2 is complete. All iteration 2 acceptance criteria AC1–AC11 are now implemented and verified; the deferred scope remains unchanged. Earlier pending-state entries above are historical verification records.
 
 Verification commands:
 
