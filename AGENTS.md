@@ -32,6 +32,7 @@ For `login.md`, use `login_DISCUSSION_NOTES.md` and `login.DECISIONS.md`.
 - Prefer TDD: derive tests from acceptance criteria, observe the relevant failure, then implement the behavior and refactor.
 - Keep changes focused on the current task and preserve unrelated work.
 - Follow existing code and naming conventions as the codebase develops.
+- Every new model must implement `IModel` (`src/notif_be/Models/IModel.cs`), following the existing `User` and `AlertRule` models.
 - Avoid overengineering. Introduce abstractions and dependencies when current requirements justify them, and defer decisions until needed.
 - Read applicable `SKILL.md` instructions when using repository skills.
 
