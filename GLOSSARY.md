@@ -4,6 +4,10 @@ Terms describing user-configured notifications about world events.
 
 ## Language
 
+**User**:
+A human individual who owns their notification preferences.
+_Avoid_: Organization, shared account (when referring to a user)
+
 **Alert rule**:
 A user's selection of event types they want notifications about and the channels through which they want those notifications. Each user has at most one alert rule and can update it.
 _Avoid_: Alert (when referring to the saved rule rather than a notification)
