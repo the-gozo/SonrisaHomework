@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3's populated-collection retrieval slice are implemented and verified. The empty-collection case is not yet tested. The notification interface and processing workflow remain pending.
+Status: Partially implemented. The Event model and AC3's in-memory repository are implemented and verified, including populated and empty collections. The notification interface and processing workflow remain pending.
 
 ## Goal
 
@@ -69,7 +69,7 @@ No ADR is proposed: the selected interface and in-memory boundaries are readily 
 
 Completed increment: Event (step 1), tested through its approved constructor/property seam. `Event : IModel` exposes get-only `EventType`, `Title`, and `Body`, with the writable `Id` required by `IModel`. Constructor validation rejects unknown event types and blank content with `ArgumentException` naming the parameter, preserving valid content verbatim. It imposes no additional ID restriction. Existing AlertRule behavior is unchanged.
 
-Current increment: AC3 (step 2), populated-collection slice complete through red -> green -> refactor following the user's implementation request. The approved boundary is the repository's public retrieval method, exercised using the real in-memory implementation. The test seeds users with and without rules and verifies all supplied users are retrievable, without requiring retrieval order. `InMemoryUserRepository` materializes the supplied collection into a private array and exposes it through `IUserRepository.GetAll()`. The empty-collection case remains the next slice. Processing-boundary tests still require separate agreement.
+Completed increment: AC3 (step 2). The approved boundary is the repository's public retrieval method, exercised using the real in-memory implementation. Tests verify populated input with and without rules, without requiring retrieval order, and an empty result for empty input. `InMemoryUserRepository` materializes the supplied collection into a private array and exposes it through `IUserRepository.GetAll()`. The empty-input test passed on its first run, requiring no production change. Next is the notification interface and processing increment; processing-boundary tests still require separate agreement.
 
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
@@ -112,6 +112,18 @@ AC3 populated-collection slice completion on 2026-11-03:
 - Empty-collection behavior has not yet been explicitly tested. AC3 is not marked fully verified. No new test or processing behavior was added in this increment.
 
 Commands for subsequent verification:
+
+AC3 empty-collection verification on 2026-11-03:
+
+- Added `Retrieval_returns_no_users_when_initialized_with_an_empty_collection`, initializing the real implementation with `Array.Empty<User>()` and asserting `GetAll()` is empty through the approved IUserRepository boundary.
+- Red check: ran the new test before making any production change. It passed immediately because the existing implementation already handles empty input; no failing state was observed or manufactured. This is coverage of existing behavior rather than a new red -> green implementation cycle.
+- Green: the filtered new-test run passed (1 test). No production change was necessary.
+- Refactor: reviewed both repository tests, the interface, and implementation for duplication, clarity, and design improvements. No refactoring was warranted; the two tests state distinct AC3 examples clearly without needing shared setup or additional abstractions.
+- Full suite: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 27 tests, with 0 failures and 0 skips.
+- Backend: `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
+- AC3 is fully implemented and verified. AC2 processing-boundary checks and AC4–AC11 remain pending.
+
+Verification commands:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`
