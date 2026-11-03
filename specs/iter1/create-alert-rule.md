@@ -89,6 +89,8 @@ For later implementation, after review and resolution of any open questions need
 
 ## Verification
 
+AC6 red step (2026-11-03): added `Alert_rule_rejects_an_unknown_event_type` at the same public constructor seam, with an unknown type alone and alongside `breaking-news`. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built; both AC6 cases failed because no `ArgumentException` was thrown, and AC5 passed (2 failed, 1 passed). Production code is unchanged; unknown-event-type validation awaits the green step.
+
 On 2026-11-03, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Alert_rule_rejects_an_empty_event_type_selection`. Both projects built successfully. The single AC5 test failed as intended: `Assert.Throws() Failure: No exception was thrown` (expected `ArgumentException`). After adding empty-array validation, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and the one test passed. Other acceptance criteria have not been tested or implemented.
 
 ## Records

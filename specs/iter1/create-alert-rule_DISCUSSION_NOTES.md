@@ -136,3 +136,7 @@ Added one constructor test with email enabled and Slack disabled, a backend proj
 ## 2026-11-03 — AC5 green step
 
 The user requested implementing functionality, followed by committing and pushing. Added a constructor guard rejecting an empty event-type array with `ArgumentException`. Ran the full test project: both projects built and the single test passed. Remaining acceptance criteria stay outside this increment.
+
+## 2026-11-03 — AC6 red step
+
+The user requested the next acceptance criterion in the same manner, with the red test first. Continued at the agreed public rule-constructor seam, without users or persistence. Added one theory covering an unknown event type alone and alongside a known type, as AC6 requires. Both cases expect `ArgumentException`, following the existing test contract. The full test run built successfully: AC5 passed and both AC6 cases failed because no exception was thrown. Production code remains unchanged. Next step is unknown-type validation when requested.
