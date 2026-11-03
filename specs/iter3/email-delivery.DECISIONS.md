@@ -56,3 +56,11 @@
 - Rationale: Exercise useful caller behavior rather than testing the recorder against itself.
 - Approval: The user answered "yes" to the proposed first test and scope change after requiring failing-test-first development.
 - Discussion: [Seam approval and red test](email-delivery_DISCUSSION_NOTES.md#2026-11-03--seam-approval-and-red-test).
+
+## D8 — Primary constructor for notification-service injection
+
+- Date: 2026-11-03.
+- Decision: Use a primary constructor for `NotifyService` and prefer primary constructors where applicable in repository guidance.
+- Rationale: Remove the explicit constructor and backing-field boilerplate for this simple injected dependency.
+- Approval: The user requested: "use primary constructor in NotifyService. add an instruction to agents.md, to use primary ctor where applicable".
+- Discussion: [Primary-constructor feedback](email-delivery_DISCUSSION_NOTES.md#2026-11-03--primary-constructor-feedback).

@@ -63,3 +63,15 @@ The user answered "yes" to the proposed notification-service seam and first emai
 Added one test through `INotifyService.NotifyAsync`, expecting one email request with the user's email and event title/body. Added only compile scaffolding: a no-op notification service and a private recorder whose send method throws `NotImplementedException`. The recorder does not yet store requests.
 
 Ran the targeted test: it compiled and failed at `Assert.Single` because no email request was recorded (1 failed, 0 passed). Stopped at red as requested. Dispatch, recording behavior, green verification, and refactor review remain pending; no further slice started. See the spec for the exact command and evidence.
+
+## 2026-11-03 — Existing slice made green
+
+The user requested "make it green". Implemented only the existing slice: retain the injected email service, forward the user's email and event title/body, return the send task, and implement recording in the private test double. The existing test now passes without changing its assertions.
+
+Reviewed production and test code for duplication, naming, clarity, and design improvements; no refactoring was warranted. Direct task forwarding and a private tuple recorder are sufficient. Targeted test passed (1/1), full suite passed (41/41), and backend build passed with 0 warnings/errors. The spec records the completed red -> green -> refactor evidence and current limits: no channel-selection guard, Slack dispatch, or startup registration in this minimal slice. No further behavior slice started. Changes remain uncommitted.
+
+## 2026-11-03 — Primary-constructor feedback
+
+The user requested a primary constructor in `NotifyService` and repository guidance to use primary constructors where applicable. Recorded [D8](email-delivery.DECISIONS.md#d8--primary-constructor-for-notification-service-injection). Replaced the explicit constructor and backing field with a primary-constructor parameter, preserving dispatch behavior. Added the requested convention to `AGENTS.md`.
+
+Verification: all 41 tests passed; backend build passed with 0 warnings/errors; `git diff --check` passed. This is a behavior-preserving refactor of the existing green slice; no new behavior test was needed. Changes remain uncommitted.

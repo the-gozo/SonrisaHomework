@@ -1,6 +1,6 @@
 # Email delivery
 
-Status: Test-first correction in progress. The user approved the notification-service dispatch seam. The first slice is red-only; dispatch and recording behavior are not implemented.
+Status: First email-dispatch slice implemented and verified through red -> green -> refactor review. AC1–AC3 are complete for the approved email-enabled-user scenario. Additional channel-selection behavior and real delivery remain deferred.
 
 ## Goal
 
@@ -36,10 +36,11 @@ Successful completion represents send-request completion rather than inbox recei
 ## Implementation plan
 
 1. Obtain confirmation of shared understanding before implementing, as required by the grilling skill.
-2. Add the interface under the existing Services namespace and a minimal recording test implementation following existing test conventions. Use a recorded tuple for request data rather than introducing a new domain model. No production caller or provider is added.
-3. Build the backend and run the existing test project. Review the interface and recorder for clarity and unnecessary complexity.
+2. Exercise the approved `INotifyService.NotifyAsync` seam with one email-enabled-user test and compile scaffolding. Observe its expected failure before implementing dispatch or recording behavior.
+3. Retain the injected `IEmailService`, forward recipient and event title/body, and return its task. Implement the private recorder only once the behavior test is red. Use tuples rather than introducing a new domain model.
+4. Run the targeted test, review production code and tests for refactoring, then run the full test project and backend build. Record evidence for all three TDD steps.
 
-Correction: Do not implement the recorder before a failing behavior test needs it. The user explicitly requires failing-test-first development here and previously declined a standalone recorder data-preservation test. Agree the first caller behavior and test seam before introducing the recorder. A proposed seam is `INotifyService.NotifyAsync`: for an email-enabled user, request email delivery through `IEmailService`. This would bring a small part of previously deferred notification-service integration into scope and requires user agreement. It verifies dispatch, not real inbox delivery.
+Do not implement a recorder before a failing behavior test needs it. The approved seam is `INotifyService.NotifyAsync`: for an email-enabled user, request email delivery through `IEmailService`. This verifies dispatch, not real inbox delivery. No standalone recorder storage test is required.
 
 ## Verification
 
@@ -68,3 +69,21 @@ Correction: Do not implement the recorder before a failing behavior test needs i
 - Red command: `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~NotifyServiceTests.Notifying_an_email_enabled_user_requests_email_delivery`.
 - Observed result: built successfully, then failed 1/1 test at `Assert.Single` because the request collection was empty. This is the expected missing-dispatch failure, not a compilation error.
 - Stopped at red as requested. Green dispatch/recording implementation and refactor review remain pending. No later slice has started; no full-suite pass is claimed for this state.
+
+### 2026-11-03 — AC3 green and refactor review
+
+- The user requested "make it green", authorizing completion of the existing red slice.
+- Green: `NotifyService` retains its injected email service and returns `SendAsync(user.Email, worldEvent.Title, worldEvent.Body)`. The private recording test implementation now appends the supplied tuple and returns `Task.CompletedTask`.
+- The same targeted command recorded above passed: 1 passed, 0 failed/skipped. The test was not weakened or changed; only the previously unimplemented recorder method changed in test code.
+- Refactor assessment: Reviewed production dispatch and test code for duplication, naming, clarity, and design improvements. No refactoring warranted. Direct task forwarding avoids an unnecessary async wrapper, and the private tuple recorder needs no additional abstraction. This completes the current slice's review before any further slice.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: all 41 passed, 0 failed/skipped.
+- `dotnet build src/notif_be/notif_be.csproj`: passed with 0 warnings and 0 errors.
+- Scope limit: This minimal dispatch implementation sends email whenever called. Email-disabled users, rule-less users, Slack dispatch, and caller-level async/failure scenarios have not been implemented or verified in this slice. `NotifyService` is not registered in application startup. Real delivery remains deferred.
+
+### 2026-11-03 — Primary-constructor refactor
+
+- Applied the user's review feedback: `NotifyService(IEmailService emailService)` replaces the explicit constructor and backing field, with dispatch unchanged. Added the primary-constructor convention to `AGENTS.md`; see D8.
+- Reviewed the resulting class: the primary-constructor parameter is used directly for the injected email service, removing redundant boilerplate. No test changes were needed for this behavior-preserving refactor.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: all 41 passed, 0 failed/skipped.
+- `dotnet build src/notif_be/notif_be.csproj`: passed with 0 warnings/errors.
+- `git diff --check`: passed.

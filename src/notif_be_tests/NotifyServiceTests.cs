@@ -26,7 +26,8 @@ public class NotifyServiceTests
 
         public Task SendAsync(string recipientEmail, string subject, string body)
         {
-            throw new NotImplementedException();
+            Requests.Add((recipientEmail, subject, body));
+            return Task.CompletedTask;
         }
     }
 }

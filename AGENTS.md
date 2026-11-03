@@ -37,6 +37,7 @@ For `login.md`, use `login_DISCUSSION_NOTES.md` and `login.DECISIONS.md`.
 - Record red, green, and refactor evidence in the relevant spec's verification section. Do not claim a refactor step was completed unless the code and tests were reviewed for improvements.
 - Keep changes focused on the current task and preserve unrelated work.
 - Follow existing code and naming conventions as the codebase develops.
+- Use primary constructors where applicable, especially for simple constructor-injected dependencies.
 - Every new model must implement `IModel` (`src/notif_be/Models/IModel.cs`), following the existing `User` and `AlertRule` models.
 - Avoid overengineering. Introduce abstractions and dependencies when current requirements justify them, and defer decisions until needed.
 - Read applicable `SKILL.md` instructions when using repository skills.
