@@ -13,8 +13,15 @@ public class EventProcessor(IUserRepository userRepository, INotifyService notif
         {
             if (user.AlertRule?.Matches(worldEvent.EventType) == true)
             {
-                await notifyService.NotifyAsync(user, worldEvent);
-                results.Add((user.Id, true));
+                try
+                {
+                    await notifyService.NotifyAsync(user, worldEvent);
+                    results.Add((user.Id, true));
+                }
+                catch
+                {
+                    results.Add((user.Id, false));
+                }
             }
         }
 

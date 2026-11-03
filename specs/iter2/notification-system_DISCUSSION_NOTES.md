@@ -288,3 +288,15 @@ Context: Identified AC9 and AC2 processing-boundary checks as the remaining work
 Added one test through the existing approved processing boundary, seeding two matching users. A test-only notification-service double records requests, returns a faulted Task for the first user, and completes normally for the second. Expected results contain one failed entry followed by one successful entry, and recorded request IDs must contain each user exactly once to exclude retries.
 
 Verification: The filtered test compiles and runs but fails with the uncaught InvalidOperationException from the first request, before result assertions. Building the test project succeeds with 0 warnings and 0 errors, including the backend. No production code changed; stopped at red for review. Green and refactor remain pending. No full-suite rerun, commit, or push was requested.
+
+## 2026-11-03 — AC9 implementation and refactor review
+
+The user requested: "add implementation". Re-ran the existing AC9 test and confirmed its expected uncaught exception failure. Added per-user exception handling for notification requests, retaining true results on completion and adding false results on failure. Processing continues to the next matching user without retrying. Repository retrieval and matching remain outside the exception handler.
+
+The unchanged AC9 test passed. Refactor review of the processor and failure test/double found no further change warranted: the explicit outcome branches are small and readable, and another abstraction is unnecessary. No new test or result representation was introduced.
+
+Verification: All 39 tests passed with no failures or skips. Backend build succeeded with 0 warnings and 0 errors. Recorded red, green, and refactor evidence in the spec. AC9 is complete; AC2 processing-boundary verification remains. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — Simplify the AC9 catch clause
+
+The user requested removing the exception type from `catch (Exception)`. Replaced it with a bare `catch` because the handler does not inspect the exception. The filtered AC9 failure-isolation test passed after this refactor. No other processing changes were made.

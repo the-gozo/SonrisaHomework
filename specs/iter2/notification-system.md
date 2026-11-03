@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3–AC8, AC10, and AC11 behavior are implemented and verified. The processor returns successful per-user entries, skips nonmatching users, supports no-recipient cases, and processes repeated submissions independently. INotifyService is declared without a production implementation. AC2 processing-boundary verification and AC9 failure isolation remain pending.
+Status: Partially implemented. The Event model and AC3–AC11 behavior are implemented and verified. The processor returns per-user success/failure entries, continues after notification failures without retries, skips nonmatching users, supports no-recipient cases, and processes repeated submissions independently. INotifyService is declared without a production implementation. AC2 processing-boundary verification remains pending.
 
 ## Goal
 
@@ -204,6 +204,18 @@ AC9 red-stage verification on 2026-11-03:
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_records_a_failed_request_without_retrying_and_continues_to_later_users`: compiled and ran 1 test, which failed with the uncaught InvalidOperationException from the first request. Result assertions were not reached. This is the expected red state.
 - `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded with 0 warnings and 0 errors, building both projects.
 - No production code changed. Stopped at red; green failure isolation and refactor review remain pending. No full-suite rerun was performed; the preceding 38-test pass predates this intentionally failing test.
+
+AC9 green and refactor verification on 2026-11-03:
+
+- The user requested implementation. Red: re-ran the existing filtered AC9 test; it failed with the first recipient's uncaught InvalidOperationException.
+- Green: added per-matching-user exception handling around the awaited notification request. Successful calls retain a true result; exceptions produce a false result and the loop continues, without retrying. Matching and repository retrieval remain outside this handling; no repository-error recovery was introduced.
+- The unchanged filtered AC9 test passed, verifying `(42, false)` followed by `(43, true)` and exactly one request for each recipient.
+- Refactor: reviewed the processor, failure double, and AC9 test for duplication, clarity, and design improvements. No refactoring was warranted: explicit success/failure branches make the per-user outcome clear without introducing another abstraction or changing the tested boundary.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: all 39 tests passed, with 0 failures and 0 skips.
+- `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
+- AC9 is complete. Detailed errors and channel-specific outcomes remain deferred. AC2 processing-boundary verification is the remaining iteration 2 item.
+
+Follow-up refactor requested by the user: simplified `catch (Exception)` to `catch`, with no exception inspection needed by the handler. The filtered AC9 failure-isolation test passed after the change.
 
 Verification commands:
 
