@@ -1,8 +1,8 @@
-namespace notif_be;
+namespace notif_be.Models;
 
-public class User
+public class User : IModel 
 {
-    public int Id { get; }
+    public int Id { get; set; }
     public string Email { get; }
     public AlertRule? AlertRule { get; }
 

@@ -1,10 +1,10 @@
-namespace notif_be;
+namespace notif_be.Models;
 
-public class AlertRule
+public class AlertRule : IModel
 {
     private readonly string[] eventTypes;
 
-    public int Id { get; }
+    public int Id { get; set; }
     public bool EmailEnabled { get; }
     public bool SlackEnabled { get; }
 

@@ -1,4 +1,5 @@
 using notif_be;
+using notif_be.Models;
 
 namespace notif_be_tests;
 
