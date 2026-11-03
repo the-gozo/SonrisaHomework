@@ -197,6 +197,14 @@ AC10 and AC11 verification on 2026-11-03:
 - Backend: `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
 - AC10 and AC11 are fully verified. AC2 processing-boundary checks and AC9 remain pending.
 
+AC9 red-stage verification on 2026-11-03:
+
+- The user accepted the proposed next step: an AC9 red test with a failing first recipient and successful second recipient. Added one test through the already approved processing boundary, using the real in-memory repository and a test-only failing notification-service double.
+- The double records recipient IDs and returns a faulted Task for user 42 and a completed Task for user 43. The test expects results `(42, false)` and `(43, true)` and exactly one request for each user, verifying no retry and continuation after failure.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_records_a_failed_request_without_retrying_and_continues_to_later_users`: compiled and ran 1 test, which failed with the uncaught InvalidOperationException from the first request. Result assertions were not reached. This is the expected red state.
+- `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded with 0 warnings and 0 errors, building both projects.
+- No production code changed. Stopped at red; green failure isolation and refactor review remain pending. No full-suite rerun was performed; the preceding 38-test pass predates this intentionally failing test.
+
 Verification commands:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`

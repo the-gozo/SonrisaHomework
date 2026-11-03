@@ -7,6 +7,25 @@ namespace notif_be_tests;
 public class EventProcessorTests
 {
     [Fact]
+    public async Task Processing_records_a_failed_request_without_retrying_and_continues_to_later_users()
+    {
+        var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
+        var repository = new InMemoryUserRepository(new[]
+        {
+            new User(42, "alice@example.com", rule),
+            new User(43, "bob@example.com", rule)
+        });
+        var notifyService = new FailingNotifyService(failingUserId: 42);
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
+
+        var results = await processor.ProcessAsync(worldEvent);
+
+        Assert.Equal(new[] { (42, false), (43, true) }, results);
+        Assert.Equal(new[] { 42, 43 }, notifyService.RequestedUserIds);
+    }
+
+    [Fact]
     public async Task Processing_the_same_event_twice_requests_notifications_again_for_matching_users()
     {
         var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
@@ -178,6 +197,19 @@ public class EventProcessorTests
         Assert.Same(worldEvent, request.Event);
         var result = Assert.Single(results);
         Assert.Equal(42, result.UserId);
+    }
+
+    private sealed class FailingNotifyService(int failingUserId) : INotifyService
+    {
+        public List<int> RequestedUserIds { get; } = new();
+
+        public Task NotifyAsync(User user, Event worldEvent)
+        {
+            RequestedUserIds.Add(user.Id);
+            return user.Id == failingUserId
+                ? Task.FromException(new InvalidOperationException("Notification request failed."))
+                : Task.CompletedTask;
+        }
     }
 
     private sealed class BlockingNotifyService(int blockedUserId) : INotifyService

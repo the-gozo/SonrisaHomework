@@ -280,3 +280,11 @@ AC11: added a test processing the same event twice with two matching users. Veri
 No red state was observed or manufactured and no production code changed. Refactor review after each slice found no further changes warranted: reused the existing recording service, shared no-recipient cases through a theory, and extended the mixed-recipient example rather than duplicating it.
 
 Full verification: 38 tests passed, 0 failures, 0 skips. Backend build succeeded with 0 warnings and 0 errors. AC10 and AC11 are complete; AC2 processing-boundary checks and AC9 remain pending. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — AC9 failure-isolation red test
+
+Context: Identified AC9 and AC2 processing-boundary checks as the remaining work and proposed an AC9 red test with a failing first recipient and a successful second recipient. The user replied: "go for it".
+
+Added one test through the existing approved processing boundary, seeding two matching users. A test-only notification-service double records requests, returns a faulted Task for the first user, and completes normally for the second. Expected results contain one failed entry followed by one successful entry, and recorded request IDs must contain each user exactly once to exclude retries.
+
+Verification: The filtered test compiles and runs but fails with the uncaught InvalidOperationException from the first request, before result assertions. Building the test project succeeds with 0 warnings and 0 errors, including the backend. No production code changed; stopped at red for review. Green and refactor remain pending. No full-suite rerun, commit, or push was requested.
