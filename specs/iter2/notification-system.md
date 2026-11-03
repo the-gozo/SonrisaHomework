@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3's in-memory repository are implemented and verified, including populated and empty collections. INotifyService is declared. AC4 has one compiling red test and an EventProcessor stub; processing behavior remains pending.
+Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC5–AC11 remain pending.
 
 ## Goal
 
@@ -73,7 +73,7 @@ Completed increment: AC3 (step 2). The approved boundary is the repository's pub
 
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
-Current slice: AC4 red only, requested after approval of the public processing boundary with a real in-memory repository and a recording notification-service double. `EventProcessor.ProcessAsync(Event)` is a minimal Task-returning stub that throws NotImplementedException. Its constructor accepts IUserRepository and INotifyService. The test seeds matching, nonmatching, and rule-less users and expects exactly one notification request containing the matching user's ID and the supplied event. No result contract is exercised in this slice; per-user results remain pending under AC8–AC9. No concrete production INotifyService implementation is added.
+Current slice: AC4 complete through red -> green -> refactor review after the user requested making the test green. `EventProcessor.ProcessAsync(Event)` retrieves users from the injected IUserRepository, skips absent/nonmatching rules, and awaits INotifyService.NotifyAsync for matching users, forwarding the supplied event. The approved test uses a real in-memory repository and recording notification-service double, with matching, nonmatching, and rule-less users. Per-user results and failure isolation remain pending under AC8–AC9; the method currently returns Task without a summary. No concrete production INotifyService implementation is added. Channel combinations, incomplete-task sequencing, repeated submissions, and no-match cases require their own subsequent verification.
 
 1. Add the event model and tests for retained fields and validation (AC1–AC2). Observe relevant failing tests before implementation. Follow `IModel` conventions and retain existing event-type values without expanding matching semantics.
 2. Introduce `IUserRepository` and a simple seeded in-memory implementation (AC3). Verify populated and empty collections.
@@ -135,6 +135,18 @@ AC4 red-stage verification on 2026-11-03:
 - Green implementation and refactor remain pending; stopped at red as requested. The historical full-suite pass above predates this intentionally failing test. No full-suite pass is claimed for the current state.
 
 Commands:
+
+AC4 green and refactor verification on 2026-11-03:
+
+- Red: re-ran the filtered EventProcessorTests before implementation; 1 test failed with NotImplementedException from ProcessAsync.
+- Green: retained the injected dependencies, retrieved users through GetAll, matched each optional AlertRule against the event type, and awaited notification requests only for matching users. The unchanged filtered test passed (1 test).
+- Refactor: reviewed EventProcessor, INotifyService, and the recording test double and test for duplication, clarity, and design improvements. No refactoring was warranted for the small loop and explicit matching condition; existing AlertRule matching is reused, and no extra abstractions or speculative processing features were added.
+- Full verification: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 28 tests, with 0 failures and 0 skips. `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
+- AC4 is implemented and verified. No additional tests or later-criterion behavior were deliberately introduced in this slice; further acceptance criteria remain pending as stated above.
+
+Follow-up refactor requested by the user on 2026-11-03: converted EventProcessor to a primary constructor, removing explicit dependency fields and constructor assignments. Processing behavior and the public constructor inputs are unchanged. After refactoring, all 28 tests passed and the backend build succeeded with 0 warnings and 0 errors. This is a behavior-preserving refactor, so no new red test was introduced.
+
+Verification commands:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`

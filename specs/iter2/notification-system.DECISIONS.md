@@ -176,3 +176,12 @@ Discussion context: [AC3 retrieval boundary approved and first red test](notific
 - Approval: After the boundary was explained, the user requested: "Make a red test". Only the red stage is authorized for this increment.
 
 Discussion context: [AC4 processing boundary approved and red test added](notification-system_DISCUSSION_NOTES.md#2026-11-03--ac4-processing-boundary-approved-and-red-test-added).
+
+## D22 — EventProcessor primary constructor
+
+- Date: 2026-11-03
+- Decision: Use a primary constructor for EventProcessor's IUserRepository and INotifyService dependencies.
+- Rationale: Remove explicit dependency fields and constructor assignments while preserving processing behavior.
+- Approval: The user requested: "Use primary constructor in EventProcessor".
+
+Discussion context: [EventProcessor primary constructor](notification-system_DISCUSSION_NOTES.md#2026-11-03--eventprocessor-primary-constructor).

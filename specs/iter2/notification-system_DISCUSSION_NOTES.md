@@ -206,3 +206,17 @@ Context: Proposed testing AC4 through the public processing method with the real
 Added one test with matching, nonmatching, and rule-less users. It awaits ProcessAsync, expects a single recorded notification request, checks the matching user ID, and verifies the supplied event is forwarded. The recording service exists only in tests. Added INotifyService.NotifyAsync(User, Event) returning Task and a minimal EventProcessor stub accepting the repository and notification service. ProcessAsync throws NotImplementedException; no processing behavior is implemented. Per-user result shape is deferred until its acceptance criteria are exercised.
 
 Verification: The filtered EventProcessorTests run compiles and executes 1 test, which fails with NotImplementedException from ProcessAsync before notification assertions. Building the test project succeeds with 0 warnings and 0 errors, including the backend. Stopped at red; green and refactor are pending. No commit or push was requested.
+
+## 2026-11-03 — AC4 made green and reviewed for refactoring
+
+The user requested: "Make test green". Re-ran the existing test and confirmed the runtime NotImplementedException failure before changing production code. EventProcessor now retains its injected repository and notification service, retrieves all users, skips absent or nonmatching alert rules, and awaits a notification request for matching users with the supplied event.
+
+The unchanged AC4 test passed. Reviewed the implementation, interface, and test for duplication, clarity, and design improvements; no refactoring was warranted. Reused the existing AlertRule.Matches behavior and kept the processor as a small direct loop. No new test, result model, or concrete notification implementation was added.
+
+Verification: Full suite passed all 28 tests, with no failures or skips. Backend build succeeded with 0 warnings and 0 errors. Recorded red, green, and refactor evidence in the spec. AC4 is complete; AC2 processing-boundary checks and AC5–AC11 verification remain pending. No commit or push was requested.
+
+## 2026-11-03 — EventProcessor primary constructor
+
+The user requested: "Use primary constructor in EventProcessor". Converted the constructor to the class declaration and removed the explicit dependency fields and assignments. The processing method uses the captured constructor parameters directly. This supersedes the earlier assessment that no constructor simplification was warranted. Approved choice recorded as [D22](notification-system.DECISIONS.md#d22--eventprocessor-primary-constructor).
+
+Verification after the refactor: all 28 tests passed; the backend build succeeded with 0 warnings and 0 errors. No behavior or test changes were needed. Changes remain uncommitted.
