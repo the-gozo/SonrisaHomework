@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model is implemented. AC3's first populated-collection test builds and fails at runtime because repository retrieval is not implemented. The repository interface and minimal stub exist; retrieval behavior, notification interface, and processing workflow remain pending.
+Status: Partially implemented. The Event model and AC3's populated-collection retrieval slice are implemented and verified. The empty-collection case is not yet tested. The notification interface and processing workflow remain pending.
 
 ## Goal
 
@@ -69,7 +69,7 @@ No ADR is proposed: the selected interface and in-memory boundaries are readily 
 
 Completed increment: Event (step 1), tested through its approved constructor/property seam. `Event : IModel` exposes get-only `EventType`, `Title`, and `Body`, with the writable `Id` required by `IModel`. Constructor validation rejects unknown event types and blank content with `ArgumentException` naming the parameter, preserving valid content verbatim. It imposes no additional ID restriction. Existing AlertRule behavior is unchanged.
 
-Current increment: AC3 (step 2), red test only at the user's request. The approved boundary is the repository's public retrieval method, exercised using the real in-memory implementation. The first test seeds users with and without rules and verifies all supplied users are retrievable, without requiring retrieval order. It proposes `IUserRepository.GetAll()` and `InMemoryUserRepository` under `notif_be.Repositories`. Complete green and refactor for this slice before adding the empty-collection case. Processing-boundary tests still require separate agreement.
+Current increment: AC3 (step 2), populated-collection slice complete through red -> green -> refactor following the user's implementation request. The approved boundary is the repository's public retrieval method, exercised using the real in-memory implementation. The test seeds users with and without rules and verifies all supplied users are retrievable, without requiring retrieval order. `InMemoryUserRepository` materializes the supplied collection into a private array and exposes it through `IUserRepository.GetAll()`. The empty-collection case remains the next slice. Processing-boundary tests still require separate agreement.
 
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
@@ -102,6 +102,16 @@ AC3 red-stage verification on 2026-11-03:
 - Green and refactor remain pending, stopping at the requested red stage. No retrieval behavior was implemented and no second test was added.
 
 Commands for completing subsequent stages:
+
+AC3 populated-collection slice completion on 2026-11-03:
+
+- Red: re-ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~InMemoryUserRepositoryTests` before implementation; the single test failed with `NotImplementedException` from `GetAll()`.
+- Green: stored the supplied users in an array during construction and returned it from `GetAll()`. The same filtered command passed (1 test).
+- Refactor: reviewed the repository, interface, and existing test for duplication, clarity, and design improvements after green. No refactoring was warranted: the implementation is a single collection with direct retrieval, and the test observes public behavior without requiring result ordering. No additional abstractions or speculative behavior were introduced.
+- Full verification after review: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 26 tests, with no failures or skips. `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
+- Empty-collection behavior has not yet been explicitly tested. AC3 is not marked fully verified. No new test or processing behavior was added in this increment.
+
+Commands for subsequent verification:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`

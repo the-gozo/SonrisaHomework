@@ -178,3 +178,13 @@ The user pointed out that the test did not build because IUserRepository and InM
 Added `IUserRepository.GetAll()` returning `IEnumerable<User>` and an InMemoryUserRepository stub accepting the supplied users. Its GetAll method throws NotImplementedException. The filtered test now compiles and runs, failing with that exception (1 failed test). Building the test project succeeds with 0 warnings and 0 errors, including the backend dependency.
 
 This supersedes the prior noncompiling red state. Green and refactor remain pending; the current slice still stops at red. No additional test, commit, or push was performed.
+
+## 2026-11-03 — Populated-collection retrieval implemented
+
+Context: On resuming, explained that the next step was green for the existing populated-collection test, followed by a refactor assessment before starting the empty-collection case. The user requested: "Implement."
+
+Re-ran the existing test and confirmed the expected NotImplementedException failure. Implemented the constructor by materializing supplied users into a private array, and GetAll by returning that collection. The filtered repository test then passed.
+
+Refactor assessment: Reviewed production code and the public-boundary test for duplication, clarity, and design improvements. No refactoring was warranted for the small direct implementation. No additional abstraction or test was introduced.
+
+Verification after review: All 26 tests passed; the backend build succeeded with 0 warnings and 0 errors. Recorded red, green, and refactor evidence in the spec. Next slice is explicit empty-collection verification; notification-service and processing work remain deferred. No commit or push was requested for this implementation.
