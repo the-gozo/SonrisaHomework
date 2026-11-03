@@ -129,3 +129,34 @@ Next step: Ask the user to confirm shared understanding of the consolidated spec
 The user answered "yes" to the confirmation question for the consolidated iteration 2 spec. Shared understanding is confirmed; the interview is complete and the spec is ready for implementation.
 
 The approved scope and decisions remain unchanged. This concludes the requested design interview; production implementation has not started. Build/tests were not run for these documentation changes.
+
+## 2026-11-03 — Event implementation suggestions
+
+Context: The user requested a review of the notification-system spec and suggestions for Event implementation using the TDD skill. Reviewed the spec, approved decisions, glossary, existing models, and AlertRule tests. This request is for recommendations; implementation has not started.
+
+Proposals, awaiting approval:
+
+- Add `Event : IModel` in `src/notif_be/Models/Event.cs`, with constructor `Event(int id, string eventType, string title, string body)`. Use a normal class consistent with User and AlertRule; the domain name needs no alternative C# name at present.
+- Expose `Id` with get/set as required by IModel, and get-only `EventType`, `Title`, and `Body`. Constructor validation keeps event type and content valid after construction.
+- Accept exactly the existing string values `breaking-news`, `market-movement`, and `natural-disaster`. Avoid introducing an enum or changing AlertRule's public contract in this slice. If extracting shared event-type validation, keep it small and preserve existing rule behavior.
+- Reject unknown/null event types and null, empty, or whitespace-only title/body with ArgumentException identifying the parameter, consistent with AlertRule's validation style. Preserve valid title/body verbatim, including surrounding whitespace. Add no positive-ID restriction, length limits, or automatic ID assignment because the spec does not require them.
+- Keep matching, recipient lookup, and notification requests outside the Event model. Add no persistence, delivery state, timestamps, or separate Notification model in this slice.
+
+Proposed test seams, not yet confirmed:
+
+1. Event's public constructor and properties (AC1–AC2): catches field retention, IModel compatibility, allowed event types, and rejected invalid content; does not exercise processing or delivery.
+2. The eventual processing operation's public entry point (AC2, later workflow slice): catches rejection of a null event before lookup or notification requests; does not test transport binding or real providers. Non-null invalid model instances should already be prevented by the constructor.
+
+Suggested TDD order after seam confirmation: one valid-event retention example, then individual invalid-input cases, each through a red/green cycle. Cover every known event type and preserve whitespace around otherwise nonblank content. Add workflow boundary verification when that workflow is implemented.
+
+Open questions and next steps: Confirm the proposed test seams before writing tests, as required by the TDD skill. These implementation recommendations are not approved technical decisions and have not been added to the decisions file. No production code or tests changed; build/tests were not run for this documentation-only review.
+
+## 2026-11-03 — Event-only approval and implementation
+
+Context: The user asked to clarify the proposed test boundaries. Explained that the constructor/property boundary covers event retention and validation, while a future processing-method boundary covers matching and notification outcomes. Recommended approving only the first boundary for this increment. The user replied: "Agree. Stick to Event for now." Recorded the scope and test-boundary approval as [D19](notification-system.DECISIONS.md#d19--event-only-increment-and-constructorproperty-test-boundary).
+
+Implemented `Event : IModel` with supplied ID, event type, title, and body. Event type and content are get-only and validated in the constructor; Id follows IModel's writable contract. Valid content is retained verbatim. Invalid types and blank content throw ArgumentException with the relevant parameter name. No additional ID rules or shared event-type abstraction were introduced.
+
+Verification used only the approved constructor/property boundary. Observed the initial missing-model compilation failure, then separate red/green cycles for unknown event types, blank titles, and blank bodies. All 25 tests passed, including 14 Event cases. Backend build succeeded with 0 warnings and 0 errors. Results are also recorded in the spec.
+
+Remaining work: Repository, notification-service interface, and processing workflow are pending. No processing-boundary tests were written. Revisit that boundary when the user proceeds to the next increment.

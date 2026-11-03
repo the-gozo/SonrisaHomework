@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Ready for implementation. The user confirmed shared understanding of the consolidated spec on 2026-11-03. Implementation has not started.
+Status: Partially implemented. On 2026-11-03 the user approved an Event-only increment, tested through its constructor and public properties. The Event model is implemented; repository, notification interface, and processing workflow remain pending.
 
 ## Goal
 
@@ -67,6 +67,8 @@ No ADR is proposed: the selected interface and in-memory boundaries are readily 
 
 ## Implementation plan
 
+Current increment: Event only (step 1). The approved test seam is the Event constructor and public properties. Processing-boundary tests require separate agreement when that increment starts. `Event : IModel` exposes get-only `EventType`, `Title`, and `Body`, with the writable `Id` required by `IModel`. Constructor validation rejects unknown event types and blank content with `ArgumentException` naming the parameter, preserving valid content verbatim. It imposes no additional ID restriction. Existing AlertRule behavior is unchanged.
+
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
 1. Add the event model and tests for retained fields and validation (AC1–AC2). Observe relevant failing tests before implementation. Follow `IModel` conventions and retain existing event-type values without expanding matching semantics.
@@ -78,9 +80,17 @@ After the user confirms shared understanding, work in small increments, using th
 
 ## Verification
 
-Discovery only. No production code changed; build and tests have not been run for this documentation increment.
+Event-only verification completed on 2026-11-03:
 
-Planned commands after implementation:
+- AC1: constructor/property tests cover all three known event types, supplied ID retention through `IModel`, and exact title/body retention including surrounding whitespace.
+- AC2 model validation: constructor tests reject null, empty, whitespace-only, unknown, and incorrectly cased event types, and null/empty/whitespace-only title and body. Exceptions identify the invalid parameter. The future workflow's null-input rejection and absence of lookup/notification side effects are not yet implemented or tested.
+- TDD evidence: the retention test first failed to compile because Event did not exist; unknown-type, blank-title, and blank-body tests each failed because no exception was thrown before adding their respective validation guards. Earlier Event tests passed after each guard.
+- Refactor assessment before commit: reviewed Event and its public-boundary tests for duplication, clarity, and design improvements. No refactoring is warranted for this small model; explicit guards and test cases remain clear. Event-type validation follows AlertRule's existing convention without adding an abstraction. This assessment occurred after implementation, not after each original cycle; subsequent slices must follow the corrected red -> green -> refactor guidance in AGENTS.md.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: passed, 25 tests total, including 14 Event cases; no failures or skips.
+- `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
+- AC3–AC11 remain pending. No repository, notification service, or processing workflow was added.
+
+Commands for subsequent increments:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`

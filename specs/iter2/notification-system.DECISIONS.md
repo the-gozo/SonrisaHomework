@@ -149,3 +149,12 @@ Discussion context: [round 5 answers](notification-system_DISCUSSION_NOTES.md#20
 - Approval: The user answered "yes to all" to Q17 and Q18.
 
 Discussion context: [round 6 answers](notification-system_DISCUSSION_NOTES.md#2026-11-03--round-6-answers-and-consolidated-spec).
+
+## D19 — Event-only increment and constructor/property test boundary
+
+- Date: 2026-11-03
+- Decision: Implement Event only for the current increment. Test through its public constructor and properties; defer agreement on the processing boundary until that increment begins.
+- Rationale: Deliver the event data and validation independently of recipient lookup and notification processing.
+- Approval: After clarification recommending boundary 1 only for the Event increment, the user replied: "Agree. Stick to Event for now."
+
+Discussion context: [Event-only approval and implementation](notification-system_DISCUSSION_NOTES.md#2026-11-03--event-only-approval-and-implementation).
