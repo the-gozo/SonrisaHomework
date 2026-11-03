@@ -4,6 +4,11 @@ public class AlertRule
 {
     public AlertRule(string[] eventTypes, bool emailEnabled, bool slackEnabled)
     {
+        if (!emailEnabled && !slackEnabled)
+        {
+            throw new ArgumentException("At least one notification channel is required.");
+        }
+
         if (eventTypes.Length == 0)
         {
             throw new ArgumentException("At least one event type is required.", nameof(eventTypes));
