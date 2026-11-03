@@ -220,3 +220,11 @@ Verification: Full suite passed all 28 tests, with no failures or skips. Backend
 The user requested: "Use primary constructor in EventProcessor". Converted the constructor to the class declaration and removed the explicit dependency fields and assignments. The processing method uses the captured constructor parameters directly. This supersedes the earlier assessment that no constructor simplification was warranted. Approved choice recorded as [D22](notification-system.DECISIONS.md#d22--eventprocessor-primary-constructor).
 
 Verification after the refactor: all 28 tests passed; the backend build succeeded with 0 warnings and 0 errors. No behavior or test changes were needed. Changes remain uncommitted.
+
+## 2026-11-03 — AC5 initial channel-combination test
+
+Context: Suggested AC5 next, verifying email-only, Slack-only, and both-enabled rules through the already approved processing boundary. Explained that current behavior should pass without production changes. The user requested: "red test pls".
+
+Added one theory with the three channel selections, using the real in-memory repository and existing recording notification-service double. Each case expects exactly one request, identifies the matching user, checks the supplied event, and observes channel selections through User.AlertRule.
+
+The filtered run passed all 3 cases immediately; no failing state was observed. No production code was changed, no artificial failure was introduced, and no refactor cycle or full-suite rerun was performed. Recorded the initial result honestly in the spec. Changes remain uncommitted; no push was requested.

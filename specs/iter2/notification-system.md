@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC5–AC11 remain pending.
+Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. AC5's three channel combinations pass against the existing implementation. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC6–AC11 remain pending.
 
 ## Goal
 
@@ -145,6 +145,12 @@ AC4 green and refactor verification on 2026-11-03:
 - AC4 is implemented and verified. No additional tests or later-criterion behavior were deliberately introduced in this slice; further acceptance criteria remain pending as stated above.
 
 Follow-up refactor requested by the user on 2026-11-03: converted EventProcessor to a primary constructor, removing explicit dependency fields and constructor assignments. Processing behavior and the public constructor inputs are unchanged. After refactoring, all 28 tests passed and the backend build succeeded with 0 warnings and 0 errors. This is a behavior-preserving refactor, so no new red test was introduced.
+
+AC5 initial test run on 2026-11-03:
+
+- The user requested a red test at the existing approved processing boundary. Added one theory with email-only, Slack-only, and both-enabled cases. Each expects a single notification request for the matching user and supplied event, with channel flags retained on the recipient's AlertRule.
+- Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_requests_one_notification_with_the_users_selected_channels`: all 3 cases passed on the first run. Both projects compiled successfully. No red state was observed; existing behavior already satisfies these cases, and no production changes were made to manufacture failure.
+- Stopped after the initial test run as requested. No further implementation or refactor cycle was undertaken, and the full suite was not re-run for this test-only increment. The preceding 28-test pass predates the new theory.
 
 Verification commands:
 
