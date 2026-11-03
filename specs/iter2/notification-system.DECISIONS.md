@@ -167,3 +167,12 @@ Discussion context: [Event-only approval and implementation](notification-system
 - Approval: In response to the proposed boundary and populated-first sequence, the user replied: "OK. Red test then," authorizing only the first red stage for now.
 
 Discussion context: [AC3 retrieval boundary approved and first red test](notification-system_DISCUSSION_NOTES.md#2026-11-03--ac3-retrieval-boundary-approved-and-first-red-test).
+
+## D21 — Public processing boundary for AC4
+
+- Date: 2026-11-03
+- Decision: Exercise the public processing method using a real in-memory repository and a recording INotifyService test double. The first example includes matching, nonmatching, and rule-less users and observes only the matching user's notification request with the supplied event.
+- Rationale: Verify recipient selection through observable notification requests without testing internal helpers or sending actual messages.
+- Approval: After the boundary was explained, the user requested: "Make a red test". Only the red stage is authorized for this increment.
+
+Discussion context: [AC4 processing boundary approved and red test added](notification-system_DISCUSSION_NOTES.md#2026-11-03--ac4-processing-boundary-approved-and-red-test-added).

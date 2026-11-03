@@ -198,3 +198,11 @@ Added one test at the already approved repository retrieval boundary: seed with 
 Refactor assessment: Reviewed the repository implementation, interface, and both tests for duplication, clarity, and design improvements. No refactoring was warranted; the examples remain small and independently understandable.
 
 Verification: All 27 tests passed, with no failures or skips. The backend build succeeded with 0 warnings and 0 errors. AC3 is now fully implemented and verified; processing work remains deferred pending agreement on its test boundary. No commit or push was requested.
+
+## 2026-11-03 — AC4 processing boundary approved and red test added
+
+Context: Proposed testing AC4 through the public processing method with the real in-memory repository and a recording notification-service double. Explained that the observable result is a request for only the matching user, with the supplied event; internal helpers and actual message delivery are outside this boundary. The user requested: "Make a red test". Approval is recorded as [D21](notification-system.DECISIONS.md#d21--public-processing-boundary-for-ac4).
+
+Added one test with matching, nonmatching, and rule-less users. It awaits ProcessAsync, expects a single recorded notification request, checks the matching user ID, and verifies the supplied event is forwarded. The recording service exists only in tests. Added INotifyService.NotifyAsync(User, Event) returning Task and a minimal EventProcessor stub accepting the repository and notification service. ProcessAsync throws NotImplementedException; no processing behavior is implemented. Per-user result shape is deferred until its acceptance criteria are exercised.
+
+Verification: The filtered EventProcessorTests run compiles and executes 1 test, which fails with NotImplementedException from ProcessAsync before notification assertions. Building the test project succeeds with 0 warnings and 0 errors, including the backend. Stopped at red; green and refactor are pending. No commit or push was requested.

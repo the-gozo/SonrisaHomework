@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3's in-memory repository are implemented and verified, including populated and empty collections. The notification interface and processing workflow remain pending.
+Status: Partially implemented. The Event model and AC3's in-memory repository are implemented and verified, including populated and empty collections. INotifyService is declared. AC4 has one compiling red test and an EventProcessor stub; processing behavior remains pending.
 
 ## Goal
 
@@ -73,6 +73,8 @@ Completed increment: AC3 (step 2). The approved boundary is the repository's pub
 
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
+Current slice: AC4 red only, requested after approval of the public processing boundary with a real in-memory repository and a recording notification-service double. `EventProcessor.ProcessAsync(Event)` is a minimal Task-returning stub that throws NotImplementedException. Its constructor accepts IUserRepository and INotifyService. The test seeds matching, nonmatching, and rule-less users and expects exactly one notification request containing the matching user's ID and the supplied event. No result contract is exercised in this slice; per-user results remain pending under AC8–AC9. No concrete production INotifyService implementation is added.
+
 1. Add the event model and tests for retained fields and validation (AC1–AC2). Observe relevant failing tests before implementation. Follow `IModel` conventions and retain existing event-type values without expanding matching semantics.
 2. Introduce `IUserRepository` and a simple seeded in-memory implementation (AC3). Verify populated and empty collections.
 3. Declare `INotifyService.NotifyAsync(User, event)` returning `Task`, with no production implementation. Use a recording/controllable test double solely for verification.
@@ -124,6 +126,15 @@ AC3 empty-collection verification on 2026-11-03:
 - AC3 is fully implemented and verified. AC2 processing-boundary checks and AC4–AC11 remain pending.
 
 Verification commands:
+
+AC4 red-stage verification on 2026-11-03:
+
+- Added one async test through the agreed processing boundary and a test-only recording INotifyService double. Added only the service interface and processor scaffolding required to compile.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~EventProcessorTests`: 1 test executed and failed with NotImplementedException from EventProcessor.ProcessAsync. The notification assertions were not reached. This is the expected runtime red state.
+- `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded with 0 warnings and 0 errors, building both backend and tests.
+- Green implementation and refactor remain pending; stopped at red as requested. The historical full-suite pass above predates this intentionally failing test. No full-suite pass is claimed for the current state.
+
+Commands:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`
