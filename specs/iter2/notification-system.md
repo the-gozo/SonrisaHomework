@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3–AC7 behavior are implemented and verified. AC8 now has a compiling red test: the processor exposes a result collection but currently returns it empty. INotifyService is declared without a production implementation. AC8 result population and further behavior under AC2 and AC9–AC11 remain pending.
+Status: Partially implemented. The Event model and AC3–AC8 behavior are implemented and verified. The processor returns a successful per-user entry after each completed notification-service call. INotifyService is declared without a production implementation. Further behavior and verification under AC2 and AC9–AC11 remain pending.
 
 ## Goal
 
@@ -176,6 +176,15 @@ AC8 red-stage verification on 2026-11-03:
 - Full test run: 35 total, 34 passed, 1 failed (only the new AC8 test), 0 skipped.
 - Backend build succeeded with 0 warnings and 0 errors.
 - Stopped at red as requested. Green result population and refactor review remain pending. Failure handling is still deferred to AC9.
+
+AC8 green and refactor verification on 2026-11-03:
+
+- The user requested making the test green. Re-ran the filtered AC8 test before changing production code: it failed on Assert.Single because the result collection was empty.
+- Green: ProcessAsync now accumulates `(UserId, Success)` entries and appends `(user.Id, true)` only after awaiting that user's notification-service call. It returns the accumulated collection after processing. The unchanged AC8 test passed (1 test).
+- Refactor: reviewed the processor and existing result test for duplication, clarity, and design improvements. No refactoring was warranted: a local list and one append after the awaited request directly express the required behavior. No new abstractions or tests were introduced.
+- Full suite: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 35 tests, with 0 failures and 0 skips.
+- Backend: `dotnet build src/notif_be/notif_be.csproj` succeeded with 0 warnings and 0 errors.
+- AC8 is complete. Success reflects service-call completion rather than confirmed receipt. Exceptions still propagate; failure isolation and failed entries remain AC9 work.
 
 Verification commands:
 

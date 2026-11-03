@@ -260,3 +260,11 @@ Context: Proposed AC8 next: expose a per-user summary and verify a matching user
 Added one test using the real in-memory repository and existing recording notification-service double. For compilation, ProcessAsync now returns Task<IReadOnlyList<(int UserId, bool Success)>> with an empty result placeholder after its existing notification loop. This preserves earlier behavior while leaving result population unimplemented. Used tuples as the minimal representation rather than introducing a model with an unnecessary identifier. No new test boundary or product behavior was proposed.
 
 Verification: The new filtered test fails on Assert.Single because the result is empty. Full suite: 34 passed, only the new AC8 test failed, 35 total, no skips. Backend build succeeded with 0 warnings and 0 errors. Green and refactor remain pending; failure isolation follows in AC9. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — AC8 made green and reviewed for refactoring
+
+The user requested: "make it green". Re-ran the existing AC8 test and observed its expected empty-result assertion failure. Replaced the empty placeholder with a local result list, appending the user's ID and Success true after each awaited notification-service call. The unchanged test then passed.
+
+Refactor assessment: Reviewed production code and the result test for duplication, clarity, and design improvements. No refactoring was warranted for the direct list accumulation. No new model, abstraction, or test was added. Success indicates service-call completion; failure handling remains deferred to AC9.
+
+Verification: All 35 tests passed, with 0 failures and 0 skips. Backend build succeeded with 0 warnings and 0 errors. Recorded red, green, and refactor evidence in the spec. Changes remain uncommitted; no push was requested.
