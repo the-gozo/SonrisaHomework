@@ -152,3 +152,11 @@ The user requested a red test for AC7. Continued at the agreed public rule-const
 ## 2026-11-03 — AC7 green step
 
 The user requested implementation. Added a constructor guard throwing `ArgumentException` when both email and Slack are disabled. Ran the full test project: both projects built and all 4 cases passed. No additional acceptance criteria were implemented.
+
+## 2026-11-03 — Remaining criteria without users: AC3 and AC4 red tests
+
+The user explicitly requested failing tests for all remaining acceptance criteria that do not require a user, after reviewing the AC3–AC7 list and discussing AC4 matching. Continued at the public rule-instance boundary: channel properties expose both preferences on one instance (AC3), and `Matches` exposes any-selected-type matching (AC4). This catches rule behavior without testing users, persistence, or delivery.
+
+Added an AC3 test for both channel flags enabled and an AC4 theory with the spec's three literal event-type/expected-result pairs. Added only public member scaffolding so the tests compile: unassigned channel properties and a matching method throwing `NotImplementedException`. Exact member names are implementation choices, not separately approved technical decisions. This request explicitly asks for both red criteria together; implementation remains deferred rather than proceeding through the normal one-slice green step.
+
+Ran the full test project: both projects built, the 4 new cases failed for missing behavior, and the 4 existing cases passed. Next step: implement AC3 and AC4 when requested.

@@ -2,6 +2,12 @@ namespace notif_be;
 
 public class AlertRule
 {
+    // Scaffolding for AC3; channel retention will be implemented in the green step.
+    public bool EmailEnabled { get; }
+    public bool SlackEnabled { get; }
+
+    public bool Matches(string eventType) => throw new NotImplementedException();
+
     public AlertRule(string[] eventTypes, bool emailEnabled, bool slackEnabled)
     {
         if (!emailEnabled && !slackEnabled)

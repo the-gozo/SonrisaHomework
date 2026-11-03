@@ -1,6 +1,6 @@
 # Create and update a user's alert rule
 
-Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. AC5 empty-event-type validation and AC6 unknown-event-type validation are implemented; their tests pass after observed failures.
+Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. AC5, AC6, and AC7 validation are implemented with passing tests. AC3 and AC4 have observed failing tests; channel retention and matching remain unimplemented.
 
 ## Goal
 
@@ -77,6 +77,8 @@ The brief still requires delivery, extensibility, and an admin view for the over
 
 ## Implementation plan
 
+Current increment: the user requested red tests for the remaining acceptance criteria that do not require a user: AC3 and AC4. Test the public rule instance through construction and channel properties for AC3, and `Matches(string eventType)` for AC4. These check channel retention and any-selected-type matching, without persistence or delivery. Read-only `EmailEnabled`/`SlackEnabled` properties and a `Matches` method throwing `NotImplementedException` are scaffolding only. Stop at red for both criteria as explicitly requested.
+
 AC7 current increment: following the observed red test and the user's request to implement, reject construction when both notification channels are disabled with `ArgumentException`. No other rule behavior is added.
 
 Current increment: test AC5 through the public `AlertRule` constructor, without a user record. Constructing with an empty event-type array, email enabled, and Slack disabled throws `ArgumentException`. After observing red, the user requested functionality; the constructor now rejects an empty array. The exception type is the initial test contract, not a separately approved API failure contract.
@@ -92,6 +94,8 @@ AC6 increment: following its observed red test and the user's request to make it
 5. Add the interaction interface according to its separate spec and run the applicable build and tests.
 
 ## Verification
+
+AC3/AC4 red step (2026-11-03): ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`. Both projects built. AC3 failed because the channel properties returned `(false, false)` instead of `(true, true)`. All 3 AC4 cases failed with `NotImplementedException`: `breaking-news` and `natural-disaster` should match, while `market-movement` should not. The 4 existing AC5/AC6/AC7 cases passed (4 failed, 4 passed). No channel-retention or matching implementation was added.
 
 AC7 green step (2026-11-03): added the constructor guard for both channels disabled. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and all 4 cases passed (AC5, AC6, and AC7).
 
