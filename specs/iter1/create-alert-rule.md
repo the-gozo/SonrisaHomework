@@ -1,6 +1,6 @@
 # Create and update a user's alert rule
 
-Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. AC5 empty-event-type validation is implemented and its test passes after an observed failure.
+Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. AC5 empty-event-type validation and AC6 unknown-event-type validation are implemented; their tests pass after observed failures.
 
 ## Goal
 
@@ -81,6 +81,8 @@ Current increment: test AC5 through the public `AlertRule` constructor, without 
 
 For later implementation, after review and resolution of any open questions needed by the chosen increment:
 
+AC6 increment: following its observed red test and the user's request to make it green, validate each selected event type against the three predefined values. Throw `ArgumentException` if any selected type is unknown, including in a mixed selection. No other rule behavior is added in this increment.
+
 1. Derive behavior tests from AC1–AC10 without coupling them to a UI or API.
 2. Observe the relevant failures before implementing rule creation, predefined-type validation, and channel validation.
 3. Implement the one-rule-per-user constraint and valid updates according to the agreed lifecycle behavior.
@@ -90,6 +92,8 @@ For later implementation, after review and resolution of any open questions need
 ## Verification
 
 AC6 red step (2026-11-03): added `Alert_rule_rejects_an_unknown_event_type` at the same public constructor seam, with an unknown type alone and alongside `breaking-news`. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built; both AC6 cases failed because no `ArgumentException` was thrown, and AC5 passed (2 failed, 1 passed). Production code is unchanged; unknown-event-type validation awaits the green step.
+
+AC6 green step (2026-11-03): added predefined-event-type validation in the constructor. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and all 3 cases passed (AC5 and both AC6 cases).
 
 On 2026-11-03, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Alert_rule_rejects_an_empty_event_type_selection`. Both projects built successfully. The single AC5 test failed as intended: `Assert.Throws() Failure: No exception was thrown` (expected `ArgumentException`). After adding empty-array validation, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and the one test passed. Other acceptance criteria have not been tested or implemented.
 

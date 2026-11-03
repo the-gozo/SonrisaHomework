@@ -140,3 +140,7 @@ The user requested implementing functionality, followed by committing and pushin
 ## 2026-11-03 — AC6 red step
 
 The user requested the next acceptance criterion in the same manner, with the red test first. Continued at the agreed public rule-constructor seam, without users or persistence. Added one theory covering an unknown event type alone and alongside a known type, as AC6 requires. Both cases expect `ArgumentException`, following the existing test contract. The full test run built successfully: AC5 passed and both AC6 cases failed because no exception was thrown. Production code remains unchanged. Next step is unknown-type validation when requested.
+
+## 2026-11-03 — AC6 green step
+
+The user requested making the AC6 test green. Added a constructor check that rejects any event type outside `breaking-news`, `market-movement`, and `natural-disaster`, throwing `ArgumentException` as required by the existing test. The full test project built successfully and all 3 cases passed. No additional acceptance criteria were implemented; the next increment remains to be selected.
