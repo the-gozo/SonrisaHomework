@@ -6,6 +6,26 @@ namespace notif_be_tests;
 
 public class EventProcessorTests
 {
+    [Fact]
+    public async Task Processing_preserves_the_event_title_and_body_verbatim()
+    {
+        var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
+        var repository = new InMemoryUserRepository(new[]
+        {
+            new User(42, "alice@example.com", rule)
+        });
+        var notifyService = new RecordingNotifyService();
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news",
+            "  Important news!  ", "\tFirst line.\r\nSecond line.\n  ");
+
+        await processor.ProcessAsync(worldEvent);
+
+        var request = Assert.Single(notifyService.Requests);
+        Assert.Equal("  Important news!  ", request.Event.Title);
+        Assert.Equal("\tFirst line.\r\nSecond line.\n  ", request.Event.Body);
+    }
+
     [Theory]
     [InlineData(true, false)]
     [InlineData(false, true)]

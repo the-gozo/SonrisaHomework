@@ -228,3 +228,11 @@ Context: Suggested AC5 next, verifying email-only, Slack-only, and both-enabled 
 Added one theory with the three channel selections, using the real in-memory repository and existing recording notification-service double. Each case expects exactly one request, identifies the matching user, checks the supplied event, and observes channel selections through User.AlertRule.
 
 The filtered run passed all 3 cases immediately; no failing state was observed. No production code was changed, no artificial failure was introduced, and no refactor cycle or full-suite rerun was performed. Recorded the initial result honestly in the spec. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — AC6 unchanged-content test
+
+Context: Explained that AC6 requires unchanged event title/body and that existing event-forwarding tests already cover this behavior. The user requested: "Red test pls".
+
+Added a focused public-processing test with whitespace and mixed line breaks in its event content. The recording notification-service boundary receives a title and body asserted against independent exact literals. No production behavior was changed.
+
+The filtered new-test run compiled both projects and passed 1 test immediately. No red state was observed or manufactured. The repository still has no separate Notification model or production notification-service implementation. Stopped after this initial run; no full-suite rerun, additional refactor cycle, commit, or push was performed. Evidence is recorded in the spec.

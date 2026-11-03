@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. AC5's three channel combinations pass against the existing implementation. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC6–AC11 remain pending.
+Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. AC5's channel combinations and AC6's unchanged-content example pass against the existing implementation. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC7–AC11 remain pending.
 
 ## Goal
 
@@ -151,6 +151,12 @@ AC5 initial test run on 2026-11-03:
 - The user requested a red test at the existing approved processing boundary. Added one theory with email-only, Slack-only, and both-enabled cases. Each expects a single notification request for the matching user and supplied event, with channel flags retained on the recipient's AlertRule.
 - Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_requests_one_notification_with_the_users_selected_channels`: all 3 cases passed on the first run. Both projects compiled successfully. No red state was observed; existing behavior already satisfies these cases, and no production changes were made to manufacture failure.
 - Stopped after the initial test run as requested. No further implementation or refactor cycle was undertaken, and the full suite was not re-run for this test-only increment. The preceding 28-test pass predates the new theory.
+
+AC6 initial test run on 2026-11-03:
+
+- The user requested a red test after discussion of unchanged event content. Added `Processing_preserves_the_event_title_and_body_verbatim` through the already approved processing boundary. It checks exact literal title and body values at the notification-service boundary, including surrounding spaces, a tab, and mixed CRLF/LF line breaks.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_preserves_the_event_title_and_body_verbatim`: passed 1 test on the initial run, compiling both projects successfully. Existing behavior already preserves the content; no red state was observed or manufactured, and no production change was made.
+- Review confirmed there is still no separate Notification model or concrete production INotifyService implementation. No further implementation or refactor cycle was undertaken, and the full suite was not rerun for this initial test-only step.
 
 Verification commands:
 
