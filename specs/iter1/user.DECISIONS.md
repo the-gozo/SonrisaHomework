@@ -79,3 +79,13 @@ Discussion context for D6–D7: [email validation and deferred behavior](user_DI
 - Approval: The user answered “both yes” to Q9 and Q10, including Q10's scope recommendation.
 
 Discussion context for D8–D9: [final scope boundaries](user_DISCUSSION_NOTES.md#2026-11-03--final-scope-boundaries).
+
+## D10 — Integer identifiers
+
+- Date: 2026-11-03
+- Decision: Use `int` for `Id` in both `User` and `AlertRule`.
+- Rationale: Follow the user's explicit identifier representation for both entities.
+- Approval: The user stated, “Use int as Id in both AlertRule and User.”
+- Scope: Supersedes the type deferral in D7. Automatic identifier generation, allocation, persistence, and uniqueness remain unspecified.
+
+Discussion context: [integer IDs and AC1 implementation](user_DISCUSSION_NOTES.md#2026-11-03--integer-ids-and-ac1-implementation).

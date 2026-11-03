@@ -87,3 +87,25 @@ The user answered “both yes” to Q9 and Q10, approving the concrete email-val
 ### Result and next steps
 
 Consolidated the spec into the agreed minimal class scope, acceptance criteria, explicitly deferred work, and a future test-first implementation plan. There are no further interview questions within this increment. Identifier type/assignment and later operations remain deliberately deferred, rather than silently assumed. Seek confirmation of shared understanding before acting on the design. No application implementation or tests were performed.
+
+## 2026-11-03 — First acceptance criterion selected for TDD
+
+### Context and scope
+
+The user requested using the TDD skill to check `user.md` and pick the first acceptance criterion to implement. Selected AC1: a person represented by `Id`, `Email`, and an optional reference to one alert rule. This request authorizes implementation work; earlier interview-only status does not override it.
+
+### Proposed seam and unresolved choice
+
+Propose testing through the `User` constructor and public properties. This catches whether supplied identity, email, and optional rule are exposed correctly; it does not cover persistence, notification delivery, or email validation in AC3–AC4. Begin with one test for supplied identity, email, and an absent rule.
+
+AC1 requires an identifier representation, which D7 explicitly deferred. Propose a caller-supplied `Guid` without automatic generation. This is a proposal, not an approved decision. Confirm this choice and the seam before writing the test, as required by the TDD skill. No application code or tests changed or checks run.
+
+## 2026-11-03 — Integer IDs and AC1 implementation
+
+The user responded to the proposed constructor/property seam and identifier choice with “Use int as Id in both AlertRule and User.” Proceeded at the proposed public class seam with the requested integer representation; see [D10](user.DECISIONS.md#d10--integer-identifiers). The prior `Guid` proposal was not accepted. The implementation accepts IDs from callers without adding an allocation mechanism or constraints on their range.
+
+Implemented AC1 with read-only `User.Id`, `User.Email`, and nullable `User.AlertRule`, supplied through construction. Added a required integer ID to the existing `AlertRule` constructor and updated its existing tests. Rule association at construction represents the approved optional reference; later assignment/update operations remain deferred.
+
+Ran three sequential red/green slices through constructors and public properties: rule ID retention (expected 17, actual 0), user data without a rule (constructor initially threw `NotImplementedException`), and the supplied optional rule (expected reference, actual null). Each failure preceded its implementation. The no-rule case also exercises AC2's valid-email example; rejection behavior in AC3–AC4 remains pending.
+
+Final verification: `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 11 cases; `dotnet build src/notif_be/notif_be.csproj` succeeded with zero warnings and errors. No persistence, delivery, automatic ID generation, or email validation was added.

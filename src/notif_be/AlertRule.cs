@@ -4,12 +4,13 @@ public class AlertRule
 {
     private readonly string[] eventTypes;
 
+    public int Id { get; }
     public bool EmailEnabled { get; }
     public bool SlackEnabled { get; }
 
     public bool Matches(string eventType) => eventTypes.Contains(eventType);
 
-    public AlertRule(string[] eventTypes, bool emailEnabled, bool slackEnabled)
+    public AlertRule(int id, string[] eventTypes, bool emailEnabled, bool slackEnabled)
     {
         if (!emailEnabled && !slackEnabled)
         {
@@ -30,6 +31,7 @@ public class AlertRule
         }
 
         this.eventTypes = (string[])eventTypes.Clone();
+        Id = id;
         EmailEnabled = emailEnabled;
         SlackEnabled = slackEnabled;
     }

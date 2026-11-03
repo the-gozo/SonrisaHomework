@@ -19,7 +19,8 @@ Allow a user to create and update their single alert rule describing which event
 
 The user specified one rule record supporting both email and Slack, rather than separate records for each channel:
 
-- `userId`: the user associated with the rule; identifier type and assignment remain unresolved.
+- `userId`: the user associated with the rule; the user ID type is `int` under the user spec. This association and identifier assignment remain unimplemented.
+- `Id`: an integer identifier for the rule itself, explicitly requested on 2026-11-03. The constructor accepts this ID from its caller; automatic assignment is deferred. This is distinct from the still-unimplemented user association above.
 - `eventTypes`: an array of strings selecting from the predefined values `breaking-news`, `market-movement`, and `natural-disaster`. Matching any selected type is sufficient.
 - An email boolean and a Slack boolean. Proposed names: `emailEnabled` and `slackEnabled`.
 
@@ -94,6 +95,8 @@ AC6 increment: following its observed red test and the user's request to make it
 5. Add the interaction interface according to its separate spec and run the applicable build and tests.
 
 ## Verification
+
+Integer-ID increment (2026-11-03): the new public-constructor/property test failed with expected `17`, actual `0` before retaining the supplied integer ID. Updated all existing constructor calls to supply an ID. Final `dotnet test src/notif_be_tests/notif_be_tests.csproj` passed all 11 cases, including the existing rule behavior and new user tests. `dotnet build src/notif_be/notif_be.csproj` succeeded with zero warnings and errors. See the [user ID decision](user.DECISIONS.md#d10--integer-identifiers).
 
 AC3/AC4 green step (2026-11-03): retained channel preferences and implemented selected-event-type matching. Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and all 8 cases passed, covering rule-instance behavior for AC3–AC7.
 

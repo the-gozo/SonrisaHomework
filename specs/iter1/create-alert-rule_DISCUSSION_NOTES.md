@@ -164,3 +164,7 @@ Ran the full test project: both projects built, the 4 new cases failed for missi
 ## 2026-11-03 — AC3/AC4 green step
 
 The user requested implementation. The constructor now retains both channel flags and copies the validated event-type array. `Matches` returns whether the incoming event type is in that selection. Ran the full test project: both projects built and all 8 cases passed. User-dependent behavior, persistence, and delivery remain outside this increment.
+
+## 2026-11-03 — Integer rule identifier
+
+During the user AC1 increment, the user explicitly requested `int` IDs in both classes; see [user decision D10](user.DECISIONS.md#d10--integer-identifiers). Added read-only `AlertRule.Id` and a required caller-supplied `id` constructor argument, updating existing test call sites. The targeted test first failed (expected 17, actual 0) and then passed after assigning the ID. This identifier belongs to the rule itself and does not implement user ownership or the deferred `userId` association. Final full suite: all 11 cases passed. Backend build succeeded with zero warnings and errors.
