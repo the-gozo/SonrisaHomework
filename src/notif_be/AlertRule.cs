@@ -2,11 +2,12 @@ namespace notif_be;
 
 public class AlertRule
 {
-    // Scaffolding for AC3; channel retention will be implemented in the green step.
+    private readonly string[] eventTypes;
+
     public bool EmailEnabled { get; }
     public bool SlackEnabled { get; }
 
-    public bool Matches(string eventType) => throw new NotImplementedException();
+    public bool Matches(string eventType) => eventTypes.Contains(eventType);
 
     public AlertRule(string[] eventTypes, bool emailEnabled, bool slackEnabled)
     {
@@ -27,5 +28,9 @@ public class AlertRule
                 throw new ArgumentException("Unknown event type.", nameof(eventTypes));
             }
         }
+
+        this.eventTypes = (string[])eventTypes.Clone();
+        EmailEnabled = emailEnabled;
+        SlackEnabled = slackEnabled;
     }
 }

@@ -160,3 +160,7 @@ The user explicitly requested failing tests for all remaining acceptance criteri
 Added an AC3 test for both channel flags enabled and an AC4 theory with the spec's three literal event-type/expected-result pairs. Added only public member scaffolding so the tests compile: unassigned channel properties and a matching method throwing `NotImplementedException`. Exact member names are implementation choices, not separately approved technical decisions. This request explicitly asks for both red criteria together; implementation remains deferred rather than proceeding through the normal one-slice green step.
 
 Ran the full test project: both projects built, the 4 new cases failed for missing behavior, and the 4 existing cases passed. Next step: implement AC3 and AC4 when requested.
+
+## 2026-11-03 — AC3/AC4 green step
+
+The user requested implementation. The constructor now retains both channel flags and copies the validated event-type array. `Matches` returns whether the incoming event type is in that selection. Ran the full test project: both projects built and all 8 cases passed. User-dependent behavior, persistence, and delivery remain outside this increment.
