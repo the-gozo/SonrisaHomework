@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\notif_be\notif_be.csproj" />
+  </ItemGroup>
+
 </Project>

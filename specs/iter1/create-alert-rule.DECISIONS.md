@@ -62,3 +62,11 @@
 - Approval: In response to Q9, the user explicitly called it an implementation detail for a later, separate spec.
 
 Discussion context: [discussion notes](create-alert-rule_DISCUSSION_NOTES.md).
+
+## D9 — First test at the rule-instance boundary
+
+- Date: 2026-11-03
+- Decision: Start with AC5 through the rule's public constructor or factory, without requiring a user record.
+- Rationale: Exercise rule-instance validation before user functionality exists.
+- Approval: The user requested an AC that does not require a user, specified rule-instance validation, and then instructed implementing the proposed AC5 test.
+- Scope: One failing test; validation implementation is a subsequent step. Exact exception type was not explicitly approved.

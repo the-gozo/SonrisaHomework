@@ -126,3 +126,13 @@ The user explicitly stopped the grilling and stated that enough information exis
 ### Next steps
 
 The draft is available for review. Do not continue the interview unless the user requests it.
+
+## 2026-11-03 — First failing test at the rule-instance boundary
+
+The user rejected starting with AC1 because no user exists yet and requested rule-instance validation. Proposed AC5: an empty event-type selection is rejected through the rule's public constructor or factory. The user then explicitly requested implementing that test, confirming this seam. See [D9](create-alert-rule.DECISIONS.md#d9--first-test-at-the-rule-instance-boundary).
+
+Added one constructor test with email enabled and Slack disabled, a backend project reference, and an empty `AlertRule` constructor scaffold. The test expects `ArgumentException`; this is an implementation choice for this test, not a separately approved failure contract. Replaced the template test. The targeted test built and failed because no exception was thrown. Next step: implement only the validation needed to pass AC5 when requested. User identity and HTTP contracts remain deferred.
+
+## 2026-11-03 — AC5 green step
+
+The user requested implementing functionality, followed by committing and pushing. Added a constructor guard rejecting an empty event-type array with `ArgumentException`. Ran the full test project: both projects built and the single test passed. Remaining acceptance criteria stay outside this increment.

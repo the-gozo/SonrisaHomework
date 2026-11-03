@@ -1,6 +1,6 @@
 # Create and update a user's alert rule
 
-Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. Application implementation has not started.
+Status: Draft for review. The user ended the interview on 2026-11-03; unresolved behavior is listed explicitly below. AC5 empty-event-type validation is implemented and its test passes after an observed failure.
 
 ## Goal
 
@@ -9,7 +9,7 @@ Allow a user to create and update their single alert rule describing which event
 ## Confirmed requirements
 
 - Creating an alert rule is the first functionality to specify, confirmed by the user on 2026-11-02.
-- This task produces specifications for later implementation, not application code.
+- The original task produced specifications; on 2026-11-03 the user authorized implementing the first failing test for AC5 at the rule-instance boundary.
 - Each user can have at most one rule, and can update that rule.
 - An event matches if its type is any one of the rule's selected event types.
 - A valid rule selects at least one predefined event type and enables at least one notification channel. Unknown event types are rejected.
@@ -77,6 +77,8 @@ The brief still requires delivery, extensibility, and an admin view for the over
 
 ## Implementation plan
 
+Current increment: test AC5 through the public `AlertRule` constructor, without a user record. Constructing with an empty event-type array, email enabled, and Slack disabled throws `ArgumentException`. After observing red, the user requested functionality; the constructor now rejects an empty array. The exception type is the initial test contract, not a separately approved API failure contract.
+
 For later implementation, after review and resolution of any open questions needed by the chosen increment:
 
 1. Derive behavior tests from AC1–AC10 without coupling them to a UI or API.
@@ -87,7 +89,7 @@ For later implementation, after review and resolution of any open questions need
 
 ## Verification
 
-Documentation only. Requirements and acceptance scenarios were checked against the user's recorded answers. Companion-file links were checked locally. No application code, build, or application tests exist for this feature; the scenarios above have not been executed.
+On 2026-11-03, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Alert_rule_rejects_an_empty_event_type_selection`. Both projects built successfully. The single AC5 test failed as intended: `Assert.Throws() Failure: No exception was thrown` (expected `ArgumentException`). After adding empty-array validation, ran `dotnet test src/notif_be_tests/notif_be_tests.csproj`: both projects built and the one test passed. Other acceptance criteria have not been tested or implemented.
 
 ## Records
 
