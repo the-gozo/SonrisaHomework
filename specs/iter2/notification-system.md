@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. On 2026-11-03 the user approved an Event-only increment, tested through its constructor and public properties. The Event model is implemented; repository, notification interface, and processing workflow remain pending.
+Status: Partially implemented. The Event model is implemented. AC3's first populated-collection test builds and fails at runtime because repository retrieval is not implemented. The repository interface and minimal stub exist; retrieval behavior, notification interface, and processing workflow remain pending.
 
 ## Goal
 
@@ -67,7 +67,9 @@ No ADR is proposed: the selected interface and in-memory boundaries are readily 
 
 ## Implementation plan
 
-Current increment: Event only (step 1). The approved test seam is the Event constructor and public properties. Processing-boundary tests require separate agreement when that increment starts. `Event : IModel` exposes get-only `EventType`, `Title`, and `Body`, with the writable `Id` required by `IModel`. Constructor validation rejects unknown event types and blank content with `ArgumentException` naming the parameter, preserving valid content verbatim. It imposes no additional ID restriction. Existing AlertRule behavior is unchanged.
+Completed increment: Event (step 1), tested through its approved constructor/property seam. `Event : IModel` exposes get-only `EventType`, `Title`, and `Body`, with the writable `Id` required by `IModel`. Constructor validation rejects unknown event types and blank content with `ArgumentException` naming the parameter, preserving valid content verbatim. It imposes no additional ID restriction. Existing AlertRule behavior is unchanged.
+
+Current increment: AC3 (step 2), red test only at the user's request. The approved boundary is the repository's public retrieval method, exercised using the real in-memory implementation. The first test seeds users with and without rules and verifies all supplied users are retrievable, without requiring retrieval order. It proposes `IUserRepository.GetAll()` and `InMemoryUserRepository` under `notif_be.Repositories`. Complete green and refactor for this slice before adding the empty-collection case. Processing-boundary tests still require separate agreement.
 
 After the user confirms shared understanding, work in small increments, using the approved decisions and acceptance criteria as the source of truth:
 
@@ -90,7 +92,16 @@ Event-only verification completed on 2026-11-03:
 - `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
 - AC3–AC11 remain pending. No repository, notification service, or processing workflow was added.
 
-Commands for subsequent increments:
+AC3 red-stage verification on 2026-11-03:
+
+- Added one populated-collection test in `InMemoryUserRepositoryTests.cs`, using the approved public retrieval boundary with no mocks.
+- Ran `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~InMemoryUserRepositoryTests`: exited 1 with CS0234 because `notif_be.Repositories` does not exist. The test assembly did not compile; no test assertions executed. This is the expected missing-API red state.
+- Initially no production API was added, leaving the test project unable to compile. The user corrected this: red should be a runnable failing test. Added `IUserRepository` with `IEnumerable<User> GetAll()` and a minimal `InMemoryUserRepository` constructor and method stub; `GetAll()` throws `NotImplementedException`.
+- Re-ran the same filtered test command: builds successfully, 1 test fails at runtime with `NotImplementedException` from `GetAll()`. No assertions execute beyond that call. This supersedes the initial compilation-failure red state.
+- `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded, 0 warnings and 0 errors; this builds both backend and test projects.
+- Green and refactor remain pending, stopping at the requested red stage. No retrieval behavior was implemented and no second test was added.
+
+Commands for completing subsequent stages:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`
 - `dotnet build src/notif_be/notif_be.csproj`

@@ -158,3 +158,12 @@ Discussion context: [round 6 answers](notification-system_DISCUSSION_NOTES.md#20
 - Approval: After clarification recommending boundary 1 only for the Event increment, the user replied: "Agree. Stick to Event for now."
 
 Discussion context: [Event-only approval and implementation](notification-system_DISCUSSION_NOTES.md#2026-11-03--event-only-approval-and-implementation).
+
+## D20 — Repository retrieval test boundary for AC3
+
+- Date: 2026-11-03
+- Decision: Test AC3 through the repository's public retrieval method using the real in-memory implementation. Cover populated and empty collections in separate red -> green -> refactor slices; processing and delivery remain outside this boundary.
+- Rationale: Verify that seeded users are retrievable without coupling tests to internal storage.
+- Approval: In response to the proposed boundary and populated-first sequence, the user replied: "OK. Red test then," authorizing only the first red stage for now.
+
+Discussion context: [AC3 retrieval boundary approved and first red test](notification-system_DISCUSSION_NOTES.md#2026-11-03--ac3-retrieval-boundary-approved-and-first-red-test).

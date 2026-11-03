@@ -160,3 +160,21 @@ Implemented `Event : IModel` with supplied ID, event type, title, and body. Even
 Verification used only the approved constructor/property boundary. Observed the initial missing-model compilation failure, then separate red/green cycles for unknown event types, blank titles, and blank bodies. All 25 tests passed, including 14 Event cases. Backend build succeeded with 0 warnings and 0 errors. Results are also recorded in the spec.
 
 Remaining work: Repository, notification-service interface, and processing workflow are pending. No processing-boundary tests were written. Revisit that boundary when the user proceeds to the next increment.
+
+## 2026-11-03 — AC3 retrieval boundary approved and first red test
+
+Context: Suggested AC3 as the next increment: a seeded in-memory user repository. Proposed testing through its public retrieval method with the real implementation, starting with populated input and then handling empty input in a later cycle. This boundary catches retrieval behavior and excludes processing and delivery. The user replied: "OK. Red test then," approving the boundary and requesting only the red stage. Recorded as [D20](notification-system.DECISIONS.md#d20--repository-retrieval-test-boundary-for-ac3).
+
+Added one test that seeds a user with an alert rule and a user without one, retrieves through the proposed `IUserRepository.GetAll()` boundary, and checks identities, email addresses, and optional rule IDs. Sorting retrieved values avoids inventing an ordering requirement. Proposed routine API names are `InMemoryUserRepository` and namespace `notif_be.Repositories`; no production types have been added.
+
+Verification: The filtered dotnet test command exited 1 with CS0234 for the missing `notif_be.Repositories` namespace. The backend built, but the test assembly failed compilation, so no assertions ran. This is the initial missing-API red state, not a passing test run.
+
+Next steps: Stop at red as requested. Green implementation and refactor assessment remain pending; do not start an empty-collection test until this slice completes. No commit or push requested for these changes.
+
+## 2026-11-03 — Correct red stage to compile and fail at runtime
+
+The user pointed out that the test did not build because IUserRepository and InMemoryUserRepository were missing. Corrected the earlier interpretation of red: provide the minimal API scaffolding needed to run the test, leaving retrieval behavior unimplemented.
+
+Added `IUserRepository.GetAll()` returning `IEnumerable<User>` and an InMemoryUserRepository stub accepting the supplied users. Its GetAll method throws NotImplementedException. The filtered test now compiles and runs, failing with that exception (1 failed test). Building the test project succeeds with 0 warnings and 0 errors, including the backend dependency.
+
+This supersedes the prior noncompiling red state. Green and refactor remain pending; the current slice still stops at red. No additional test, commit, or push was performed.
