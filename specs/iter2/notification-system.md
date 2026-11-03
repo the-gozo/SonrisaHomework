@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model, AC3's in-memory repository, and AC4 recipient selection are implemented and verified. AC5's channel combinations and AC6's unchanged-content example pass against the existing implementation. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC7–AC11 remain pending.
+Status: Partially implemented. The Event model and AC3–AC7 behavior are implemented and verified. AC7 tests confirm sequential awaiting and waiting for the final request before completion. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC8–AC11 remain pending.
 
 ## Goal
 
@@ -157,6 +157,16 @@ AC6 initial test run on 2026-11-03:
 - The user requested a red test after discussion of unchanged event content. Added `Processing_preserves_the_event_title_and_body_verbatim` through the already approved processing boundary. It checks exact literal title and body values at the notification-service boundary, including surrounding spaces, a tab, and mixed CRLF/LF line breaks.
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_preserves_the_event_title_and_body_verbatim`: passed 1 test on the initial run, compiling both projects successfully. Existing behavior already preserves the content; no red state was observed or manufactured, and no production change was made.
 - Review confirmed there is still no separate Notification model or concrete production INotifyService implementation. No further implementation or refactor cycle was undertaken, and the full suite was not rerun for this initial test-only step.
+
+AC7 verification on 2026-11-03:
+
+- Added a two-case theory through the approved public processing boundary, using two matching users and a test-only controllable notification service. Blocking the first user's request verifies only that request has started and processing remains incomplete. Blocking the second verifies processing still awaits the final request. Releasing the blocked request allows processing to complete, with requests recorded for both users in order.
+- TaskCompletionSource signals coordinate the tests without sleeps. A thread-safe queue records requests; a finally block releases the task and awaits processing to clean up even after an assertion failure. Five-second WaitAsync bounds are hang guards, not timing assertions.
+- Initial test run: the filtered AC7 theory passed both cases against existing production code. No red state was observed or manufactured; no production change was needed.
+- Refactor: reviewed the processor and its tests for duplication, clarity, and design improvements. Both waiting cases share one theory and a focused blocking service double. No further refactoring was warranted; the existing recording double remains simple for tests needing immediate completion.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj`: passed all 34 tests, with 0 failures and 0 skips, including the AC5 and AC6 additions.
+- `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
+- AC7 is verified. AC2 processing-boundary checks and AC8–AC11 remain pending.
 
 Verification commands:
 

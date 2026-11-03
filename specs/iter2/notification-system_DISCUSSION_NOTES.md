@@ -236,3 +236,19 @@ Context: Explained that AC6 requires unchanged event title/body and that existin
 Added a focused public-processing test with whitespace and mixed line breaks in its event content. The recording notification-service boundary receives a title and body asserted against independent exact literals. No production behavior was changed.
 
 The filtered new-test run compiled both projects and passed 1 test immediately. No red state was observed or manufactured. The repository still has no separate Notification model or production notification-service implementation. Stopped after this initial run; no full-suite rerun, additional refactor cycle, commit, or push was performed. Evidence is recorded in the spec.
+
+## 2026-11-03 — AC7 sequential awaiting tests
+
+Context: Proposed verifying that the first incomplete request prevents the next from starting and that processing only completes after requests finish. The user requested: "make tests". This uses the already approved public processing boundary.
+
+Added a two-case theory with two matching users and a blocking INotifyService test double. One case blocks the first request and verifies the second has not started; the other blocks the final request. Both verify processing remains incomplete while blocked and completes with requests for both users after release. TaskCompletionSource signals avoid sleeps; five-second timeout guards prevent hangs. A concurrent queue supports safe observation across continuations, and finally releases the gate and awaits cleanup.
+
+Both cases passed on their first run against existing production behavior. No red state was observed or manufactured, and no production code changed. Refactor review found no further change warranted: the theory shares the two cases clearly and the blocking double is specific to the service boundary.
+
+Full verification: All 34 tests passed, including AC5 and AC6 coverage; backend build succeeded with 0 warnings and 0 errors. AC7 is complete. AC2 processing-boundary checks and AC8–AC11 remain pending. Changes remain uncommitted; no push was requested.
+
+## 2026-11-03 — AC7 test-double explanation and commit request
+
+Explained that blockedUserId selects the recipient whose simulated notification request remains unfinished; it does not mean the user is blocked. BlockingNotifyService records each recipient, signals when the selected request starts, and returns an unfinished task for that request. Other requests complete immediately. ReleaseBlockedRequest completes the pending task so processing can continue. The started signal coordinates assertions; the completion signal controls progression. RunContinuationsAsynchronously prevents waiting code from running inline in the signaling call.
+
+The clearer name userIdWithPendingNotification was suggested but no rename was requested or applied. The user requested committing and pushing the existing AC7 changes.

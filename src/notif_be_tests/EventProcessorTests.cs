@@ -6,6 +6,40 @@ namespace notif_be_tests;
 
 public class EventProcessorTests
 {
+    [Theory]
+    [InlineData(42, 1)]
+    [InlineData(43, 2)]
+    public async Task Processing_waits_for_each_notification_before_proceeding_or_completing(
+        int blockedUserId, int expectedRequestsBeforeRelease)
+    {
+        var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
+        var repository = new InMemoryUserRepository(new[]
+        {
+            new User(42, "alice@example.com", rule),
+            new User(43, "bob@example.com", rule)
+        });
+        var notifyService = new BlockingNotifyService(blockedUserId);
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
+
+        var processing = processor.ProcessAsync(worldEvent);
+
+        try
+        {
+            await notifyService.BlockedRequestStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            Assert.Equal(expectedRequestsBeforeRelease, notifyService.RequestedUserIds.Count);
+            Assert.False(processing.IsCompleted);
+        }
+        finally
+        {
+            notifyService.ReleaseBlockedRequest();
+            await processing.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+
+        Assert.Equal(new[] { 42, 43 }, notifyService.RequestedUserIds.ToArray());
+    }
+
     [Fact]
     public async Task Processing_preserves_the_event_title_and_body_verbatim()
     {
@@ -72,6 +106,30 @@ public class EventProcessorTests
         var request = Assert.Single(notifyService.Requests);
         Assert.Equal(42, request.User.Id);
         Assert.Same(worldEvent, request.Event);
+    }
+
+    private sealed class BlockingNotifyService(int blockedUserId) : INotifyService
+    {
+        private readonly TaskCompletionSource completion =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource BlockedRequestStarted { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public System.Collections.Concurrent.ConcurrentQueue<int> RequestedUserIds { get; } = new();
+
+        public Task NotifyAsync(User user, Event worldEvent)
+        {
+            RequestedUserIds.Enqueue(user.Id);
+            if (user.Id == blockedUserId)
+            {
+                BlockedRequestStarted.SetResult();
+                return completion.Task;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public void ReleaseBlockedRequest() => completion.TrySetResult();
     }
 
     private sealed class RecordingNotifyService : INotifyService
