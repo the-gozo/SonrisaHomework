@@ -217,6 +217,14 @@ AC9 green and refactor verification on 2026-11-03:
 
 Follow-up refactor requested by the user: simplified `catch (Exception)` to `catch`, with no exception inspection needed by the handler. The filtered AC9 failure-isolation test passed after the change.
 
+AC2 processing-boundary red-stage verification on 2026-11-03:
+
+- The user requested the remaining null-event test through the approved processing boundary. Added one test expecting ArgumentNullException identifying worldEvent, no repository lookup, and no notification requests.
+- A test-only recording repository decorator delegates to the real empty in-memory repository and observes whether GetAll is invoked. Empty input ensures rejection cannot depend on entering the recipient loop. The existing recording notification-service double observes outgoing requests.
+- `dotnet test src/notif_be_tests/notif_be_tests.csproj --filter FullyQualifiedName~Processing_rejects_a_null_event_before_user_lookup_or_notification_requests`: compiled and executed 1 test, which failed because no ArgumentNullException was thrown. Later assertions were not reached. This is the expected red state.
+- `dotnet build src/notif_be_tests/notif_be_tests.csproj`: succeeded with 0 warnings and 0 errors, building both projects.
+- No production code changed. Stopped at red; null-guard implementation and refactor review remain pending. The full suite was not rerun; the historical 39-test pass predates this intentionally failing test.
+
 Verification commands:
 
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`

@@ -300,3 +300,11 @@ Verification: All 39 tests passed with no failures or skips. Backend build succe
 ## 2026-11-03 — Simplify the AC9 catch clause
 
 The user requested removing the exception type from `catch (Exception)`. Replaced it with a bare `catch` because the handler does not inspect the exception. The filtered AC9 failure-isolation test passed after this refactor. No other processing changes were made.
+
+## 2026-11-03 — AC2 null-event processing red test
+
+Context: Identified null-event rejection before lookup or notification as the remaining iteration 2 check. The user requested: "add test". Added one test through the existing approved processing boundary, expecting ArgumentNullException with parameter name worldEvent, no user lookup, and no notification requests.
+
+Wrapped the real empty in-memory repository in a small test-only recording decorator to observe lookup. This explicitly verifies the required absence of lookup rather than internal processing details; an empty repository also ensures rejection does not depend on the recipient loop. Reused the recording notification-service double.
+
+Verification: The filtered test compiles and executes but fails because no exception is thrown. Later no-side-effect assertions are not reached. Building the test project succeeds with 0 warnings and 0 errors, including the backend. No production code changed. Stopped at red; green and refactor remain pending. No full-suite rerun, commit, or push was requested.

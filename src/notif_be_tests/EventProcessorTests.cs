@@ -7,6 +7,22 @@ namespace notif_be_tests;
 public class EventProcessorTests
 {
     [Fact]
+    public async Task Processing_rejects_a_null_event_before_user_lookup_or_notification_requests()
+    {
+        var repository = new RecordingUserRepository(
+            new InMemoryUserRepository(Array.Empty<User>()));
+        var notifyService = new RecordingNotifyService();
+        var processor = new EventProcessor(repository, notifyService);
+
+        var exception = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            processor.ProcessAsync(null!));
+
+        Assert.Equal("worldEvent", exception.ParamName);
+        Assert.False(repository.LookupRequested);
+        Assert.Empty(notifyService.Requests);
+    }
+
+    [Fact]
     public async Task Processing_records_a_failed_request_without_retrying_and_continues_to_later_users()
     {
         var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
@@ -197,6 +213,17 @@ public class EventProcessorTests
         Assert.Same(worldEvent, request.Event);
         var result = Assert.Single(results);
         Assert.Equal(42, result.UserId);
+    }
+
+    private sealed class RecordingUserRepository(IUserRepository inner) : IUserRepository
+    {
+        public bool LookupRequested { get; private set; }
+
+        public IEnumerable<User> GetAll()
+        {
+            LookupRequested = true;
+            return inner.GetAll();
+        }
     }
 
     private sealed class FailingNotifyService(int failingUserId) : INotifyService
