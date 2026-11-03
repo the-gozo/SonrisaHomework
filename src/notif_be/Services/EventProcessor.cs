@@ -5,7 +5,7 @@ namespace notif_be.Services;
 
 public class EventProcessor(IUserRepository userRepository, INotifyService notifyService)
 {
-    public async Task ProcessAsync(Event worldEvent)
+    public async Task<IReadOnlyList<(int UserId, bool Success)>> ProcessAsync(Event worldEvent)
     {
         foreach (var user in userRepository.GetAll())
         {
@@ -14,5 +14,7 @@ public class EventProcessor(IUserRepository userRepository, INotifyService notif
                 await notifyService.NotifyAsync(user, worldEvent);
             }
         }
+
+        return Array.Empty<(int UserId, bool Success)>();
     }
 }

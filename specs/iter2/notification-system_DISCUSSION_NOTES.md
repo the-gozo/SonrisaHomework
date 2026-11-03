@@ -252,3 +252,11 @@ Full verification: All 34 tests passed, including AC5 and AC6 coverage; backend 
 Explained that blockedUserId selects the recipient whose simulated notification request remains unfinished; it does not mean the user is blocked. BlockingNotifyService records each recipient, signals when the selected request starts, and returns an unfinished task for that request. Other requests complete immediately. ReleaseBlockedRequest completes the pending task so processing can continue. The started signal coordinates assertions; the completion signal controls progression. RunContinuationsAsynchronously prevents waiting code from running inline in the signaling call.
 
 The clearer name userIdWithPendingNotification was suggested but no rename was requested or applied. The user requested committing and pushing the existing AC7 changes.
+
+## 2026-11-03 — AC8 successful-result red test
+
+Context: Proposed AC8 next: expose a per-user summary and verify a matching user's completed notification-service call produces a successful result with that user's ID. The user requested: "create test". Used the already approved processing boundary and stopped at red.
+
+Added one test using the real in-memory repository and existing recording notification-service double. For compilation, ProcessAsync now returns Task<IReadOnlyList<(int UserId, bool Success)>> with an empty result placeholder after its existing notification loop. This preserves earlier behavior while leaving result population unimplemented. Used tuples as the minimal representation rather than introducing a model with an unnecessary identifier. No new test boundary or product behavior was proposed.
+
+Verification: The new filtered test fails on Assert.Single because the result is empty. Full suite: 34 passed, only the new AC8 test failed, 35 total, no skips. Backend build succeeded with 0 warnings and 0 errors. Green and refactor remain pending; failure isolation follows in AC9. Changes remain uncommitted; no push was requested.

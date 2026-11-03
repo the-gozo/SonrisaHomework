@@ -6,6 +6,25 @@ namespace notif_be_tests;
 
 public class EventProcessorTests
 {
+    [Fact]
+    public async Task Processing_returns_a_successful_result_when_a_users_notification_request_completes()
+    {
+        var rule = new AlertRule(17, new[] { "breaking-news" }, true, false);
+        var repository = new InMemoryUserRepository(new[]
+        {
+            new User(42, "alice@example.com", rule)
+        });
+        var notifyService = new RecordingNotifyService();
+        var processor = new EventProcessor(repository, notifyService);
+        var worldEvent = new Event(7, "breaking-news", "Important news", "Full report");
+
+        var results = await processor.ProcessAsync(worldEvent);
+
+        var result = Assert.Single(results);
+        Assert.Equal(42, result.UserId);
+        Assert.True(result.Success);
+    }
+
     [Theory]
     [InlineData(42, 1)]
     [InlineData(43, 2)]

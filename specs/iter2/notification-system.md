@@ -1,6 +1,6 @@
 # Notification system
 
-Status: Partially implemented. The Event model and AC3–AC7 behavior are implemented and verified. AC7 tests confirm sequential awaiting and waiting for the final request before completion. INotifyService is declared without a production implementation. Further processing behavior and verification under AC2 and AC8–AC11 remain pending.
+Status: Partially implemented. The Event model and AC3–AC7 behavior are implemented and verified. AC8 now has a compiling red test: the processor exposes a result collection but currently returns it empty. INotifyService is declared without a production implementation. AC8 result population and further behavior under AC2 and AC9–AC11 remain pending.
 
 ## Goal
 
@@ -167,6 +167,15 @@ AC7 verification on 2026-11-03:
 - `dotnet test src/notif_be_tests/notif_be_tests.csproj`: passed all 34 tests, with 0 failures and 0 skips, including the AC5 and AC6 additions.
 - `dotnet build src/notif_be/notif_be.csproj`: succeeded with 0 warnings and 0 errors.
 - AC7 is verified. AC2 processing-boundary checks and AC8–AC11 remain pending.
+
+AC8 red-stage verification on 2026-11-03:
+
+- Added one test through the existing approved processing boundary: a matching user's notification-service call completes normally, and processing must return one entry with UserId 42 and Success true.
+- Minimal compiling scaffold: changed ProcessAsync's return type to `Task<IReadOnlyList<(int UserId, bool Success)>>` and return an empty tuple collection after the existing notification loop. Existing recipient matching and delivery requests are preserved. This supersedes the earlier Task-only signature; callers that only await completion remain valid. Result population is intentionally unimplemented. Tuples avoid introducing an unnecessary new model or identifier.
+- Filtered new-test run: 1 failed test, with Assert.Single reporting an empty collection. This is the expected assertion-level red state.
+- Full test run: 35 total, 34 passed, 1 failed (only the new AC8 test), 0 skipped.
+- Backend build succeeded with 0 warnings and 0 errors.
+- Stopped at red as requested. Green result population and refactor review remain pending. Failure handling is still deferred to AC9.
 
 Verification commands:
 
